@@ -218,11 +218,11 @@ namespace Ionic.Zlib
 
         private int _headerByteCount;
         internal ZlibBaseStream _baseStream;
-        bool _disposed;
-        bool _firstReadDone;
-        string _FileName;
-        string _Comment;
-        int _Crc32;
+        private bool _disposed;
+        private bool _firstReadDone;
+        private string _FileName;
+        private string _Comment;
+        private int _Crc32;
 
 
         /// <summary>

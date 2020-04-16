@@ -1031,7 +1031,7 @@ namespace Ionic.Zlib
 
         // used only when Trace is defined
         [Flags]
-        enum TraceBits
+        private enum TraceBits
         {
             None         = 0,
             Write        = 1,    // write out

@@ -63,7 +63,7 @@ namespace Ionic.Zlib
     {
         internal ZlibBaseStream _baseStream;
         internal System.IO.Stream _innerStream;
-        bool _disposed;
+        private bool _disposed;
 
         /// <summary>
         /// Create a DeflateStream using the specified CompressionMode.

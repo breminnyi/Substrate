@@ -71,7 +71,7 @@ namespace Ionic.Zlib
     public class ZlibStream : Stream
     {
         internal ZlibBaseStream _baseStream;
-        bool _disposed;
+        private bool _disposed;
 
         /// <summary>
         /// Create a <c>ZlibStream</c> using the specified <c>CompressionMode</c>.

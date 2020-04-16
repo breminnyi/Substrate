@@ -46,11 +46,6 @@ namespace Ionic.Zlib
     /// files.
     /// </summary>
 
-    [Interop.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000C")]
-    [Interop.ComVisible(true)]
-#if !NETCF
-    [Interop.ClassInterface(Interop.ClassInterfaceType.AutoDispatch)]
-#endif
     internal class Crc32
     {
         /// <summary>

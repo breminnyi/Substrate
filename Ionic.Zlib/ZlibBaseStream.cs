@@ -47,7 +47,7 @@ namespace Ionic.Zlib
         protected internal CompressionStrategy Strategy = CompressionStrategy.Default;
 
         // workitem 7159
-        Crc32 crc;
+        private Crc32 crc;
         protected internal string _GzipFileName;
         protected internal string _GzipComment;
         protected internal DateTime _GzipMtime;

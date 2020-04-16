@@ -2,7 +2,7 @@ using System;
 
 namespace Ionic.Zlib
 {
-    sealed class InflateCodes
+    internal sealed class InflateCodes
     {
         // waiting for "i:"=input,
         //             "o:"=output,

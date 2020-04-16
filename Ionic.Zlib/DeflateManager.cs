@@ -232,7 +232,7 @@ namespace Ionic.Zlib
 
         internal int block_start;
 
-        Config config;
+        private Config config;
         internal int match_length;    // length of best match
         internal int prev_match;      // previous match
         internal int match_available; // set if previous match exists
