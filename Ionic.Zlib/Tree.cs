@@ -348,7 +348,7 @@ namespace Ionic.Zlib
                                 
                 // Create a new node father of n and m
                 tree[node * 2] = unchecked((short) (tree[n * 2] + tree[m * 2]));
-                s.depth[node] = (sbyte) (System.Math.Max((byte) s.depth[n], (byte) s.depth[m]) + 1);
+                s.depth[node] = (sbyte) (Math.Max((byte) s.depth[n], (byte) s.depth[m]) + 1);
                 tree[n * 2 + 1] = tree[m * 2 + 1] = (short) node;
                                 
                 // and insert the new node in the heap

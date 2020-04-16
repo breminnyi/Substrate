@@ -24,33 +24,6 @@ using System.IO;
 
 namespace Ionic.Zlib
 {
-        internal class WorkItem
-        {
-            internal enum Status { None=0, Filling=1, Filled=2, Compressing=3, Compressed=4, Writing=5, Done=6 }
-            public byte[] buffer;
-            public byte[] compressed;
-            public int status;
-            public int crc;
-            public int index;
-            public int inputBytesAvailable;
-            public int compressedBytesAvailable;
-            public ZlibCodec compressor;
-
-            public WorkItem(int size, Ionic.Zlib.CompressionLevel compressLevel, CompressionStrategy strategy)
-            {
-                buffer= new byte[size];
-                // alloc 5 bytes overhead for every block (margin of safety= 2)
-                var n = size + ((size / 32768)+1) * 5 * 2;
-                compressed= new byte[n];
-
-                status = (int)Status.None;
-                compressor = new ZlibCodec();
-                compressor.InitializeDeflate(compressLevel, false);
-                compressor.OutputBuffer = compressed;
-                compressor.InputBuffer = buffer;
-            }
-        }
-
     /// <summary>
     ///   A class for compressing and decompressing streams using the
     ///   Deflate algorithm with multiple threads.
@@ -90,14 +63,14 @@ namespace Ionic.Zlib
     ///
     /// </remarks>
     /// <seealso cref="Ionic.Zlib.DeflateStream" />
-    internal class ParallelDeflateOutputStream : System.IO.Stream
+    internal class ParallelDeflateOutputStream : Stream
     {
 
         private static readonly int IO_BUFFER_SIZE_DEFAULT = 64 * 1024;  // 128k
 
         private System.Collections.Generic.List<WorkItem> _pool;
         private bool                        _leaveOpen;
-        private System.IO.Stream            _outStream;
+        private Stream            _outStream;
         private int                         _nextToFill, _nextToWrite;
         private int                         _bufferSize = IO_BUFFER_SIZE_DEFAULT;
         private ManualResetEvent            _writingDone;
@@ -110,7 +83,7 @@ namespace Ionic.Zlib
         private int                         _pc;
         private int                         _Crc32;
         private long                       _totalBytesProcessed;
-        private Ionic.Zlib.CompressionLevel _compressLevel;
+        private CompressionLevel _compressLevel;
         private volatile Exception          _pendingException;
         private object                      _eLock = new object();  // protects _pendingException
 
@@ -194,7 +167,7 @@ namespace Ionic.Zlib
         /// </code>
         /// </example>
         /// <param name="stream">The stream to which compressed data will be written.</param>
-        public ParallelDeflateOutputStream(System.IO.Stream stream)
+        public ParallelDeflateOutputStream(Stream stream)
             : this(stream, CompressionLevel.Default, CompressionStrategy.Default, false)
         {
         }
@@ -208,7 +181,7 @@ namespace Ionic.Zlib
         /// </remarks>
         /// <param name="stream">The stream to which compressed data will be written.</param>
         /// <param name="level">A tuning knob to trade speed for effectiveness.</param>
-        public ParallelDeflateOutputStream(System.IO.Stream stream, CompressionLevel level)
+        public ParallelDeflateOutputStream(Stream stream, CompressionLevel level)
             : this(stream, level, CompressionStrategy.Default, false)
         {
         }
@@ -225,7 +198,7 @@ namespace Ionic.Zlib
         /// <param name="leaveOpen">
         ///    true if the application would like the stream to remain open after inflation/deflation.
         /// </param>
-        public ParallelDeflateOutputStream(System.IO.Stream stream, bool leaveOpen)
+        public ParallelDeflateOutputStream(Stream stream, bool leaveOpen)
             : this(stream, CompressionLevel.Default, CompressionStrategy.Default, leaveOpen)
         {
         }
@@ -243,7 +216,7 @@ namespace Ionic.Zlib
         /// <param name="leaveOpen">
         ///    true if the application would like the stream to remain open after inflation/deflation.
         /// </param>
-        public ParallelDeflateOutputStream(System.IO.Stream stream, CompressionLevel level, bool leaveOpen)
+        public ParallelDeflateOutputStream(Stream stream, CompressionLevel level, bool leaveOpen)
             : this(stream, CompressionLevel.Default, CompressionStrategy.Default, leaveOpen)
         {
         }
@@ -267,13 +240,13 @@ namespace Ionic.Zlib
         /// <param name="leaveOpen">
         ///    true if the application would like the stream to remain open after inflation/deflation.
         /// </param>
-        public ParallelDeflateOutputStream(System.IO.Stream stream,
+        public ParallelDeflateOutputStream(Stream stream,
                                            CompressionLevel level,
                                            CompressionStrategy strategy,
                                            bool leaveOpen)
         {
             TraceOutput(TraceBits.Lifecycle | TraceBits.Session, "-------------------------------------------------------");
-            TraceOutput(TraceBits.Lifecycle | TraceBits.Session, "Create {0:X8}", this.GetHashCode());
+            TraceOutput(TraceBits.Lifecycle | TraceBits.Session, "Create {0:X8}", GetHashCode());
             _compressLevel= level;
             _leaveOpen = leaveOpen;
             Strategy = strategy;
@@ -424,7 +397,7 @@ namespace Ionic.Zlib
 
         private void _KickoffWriter()
         {
-            if (!ThreadPool.QueueUserWorkItem(new WaitCallback(this._PerpetualWriterMethod)))
+            if (!ThreadPool.QueueUserWorkItem(new WaitCallback(_PerpetualWriterMethod)))
                 throw new Exception("Cannot enqueue writer thread.");
         }
 
@@ -635,7 +608,7 @@ namespace Ionic.Zlib
         /// </remarks>
         public override void Close()
         {
-            TraceOutput(TraceBits.Session, "Close {0:X8}", this.GetHashCode());
+            TraceOutput(TraceBits.Session, "Close {0:X8}", GetHashCode());
 
             if (_isClosed) return;
 
@@ -692,7 +665,7 @@ namespace Ionic.Zlib
         /// </remarks>
         new public void  Dispose()
         {
-            TraceOutput(TraceBits.Lifecycle, "Dispose  {0:X8}", this.GetHashCode());
+            TraceOutput(TraceBits.Lifecycle, "Dispose  {0:X8}", GetHashCode());
             _isDisposed= true;
             _pool = null;
             TraceOutput(TraceBits.Synch, "Synch    _sessionReset.Set()  Dispose");
@@ -753,7 +726,7 @@ namespace Ionic.Zlib
         public void Reset(Stream stream)
         {
             TraceOutput(TraceBits.Session, "-------------------------------------------------------");
-            TraceOutput(TraceBits.Session, "Reset {0:X8} firstDone({1})", this.GetHashCode(), _firstWriteDone);
+            TraceOutput(TraceBits.Session, "Reset {0:X8} firstDone({1})", GetHashCode(), _firstWriteDone);
 
             if (!_firstWriteDone) return;
 
@@ -811,7 +784,7 @@ namespace Ionic.Zlib
 
                     // repeatedly write buffers as they become ready
                     WorkItem workitem = null;
-                    var c= new Ionic.Zlib.CRC32();
+                    var c= new CRC32();
                     do
                     {
                         workitem = _pool[_nextToWrite % _pc];
@@ -946,7 +919,7 @@ namespace Ionic.Zlib
                 }
                 while (true);
             }
-            catch (System.Exception exc1)
+            catch (Exception exc1)
             {
                 lock(_eLock)
                 {
@@ -999,7 +972,7 @@ namespace Ionic.Zlib
                     Monitor.Pulse(workitem);
                 }
             }
-            catch (System.Exception exc1)
+            catch (Exception exc1)
             {
                 lock(_eLock)
                 {
@@ -1126,7 +1099,7 @@ namespace Ionic.Zlib
         /// <summary>
         /// This method always throws a NotImplementedException.
         /// </summary>
-        public override long Seek(long offset, System.IO.SeekOrigin origin)
+        public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotImplementedException();
         }

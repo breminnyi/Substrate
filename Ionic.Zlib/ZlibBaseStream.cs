@@ -29,10 +29,7 @@ using System.IO;
 
 namespace Ionic.Zlib
 {
-
-    internal enum ZlibStreamFlavor { ZLIB = 1950, DEFLATE = 1951, GZIP = 1952 }
-
-    internal class ZlibBaseStream : System.IO.Stream
+    internal class ZlibBaseStream : Stream
     {
         protected internal ZlibCodec _z = null; // deferred init... new ZlibCodec();
 
@@ -46,11 +43,11 @@ namespace Ionic.Zlib
         protected internal int _bufferSize = ZlibConstants.WorkingBufferSizeDefault;
         protected internal byte[] _buf1 = new byte[1];
 
-        protected internal System.IO.Stream _stream;
+        protected internal Stream _stream;
         protected internal CompressionStrategy Strategy = CompressionStrategy.Default;
 
         // workitem 7159
-        Ionic.Zlib.CRC32 crc;
+        CRC32 crc;
         protected internal string _GzipFileName;
         protected internal string _GzipComment;
         protected internal DateTime _GzipMtime;
@@ -58,20 +55,20 @@ namespace Ionic.Zlib
 
         internal int Crc32 { get { if (crc == null) return 0; return crc.Crc32Result; } }
 
-        public ZlibBaseStream(System.IO.Stream stream,
+        public ZlibBaseStream(Stream stream,
                               CompressionMode compressionMode,
                               CompressionLevel level,
                               ZlibStreamFlavor flavor,
                               bool leaveOpen)
             : base()
         {
-            this._flushMode = FlushType.None;
+            _flushMode = FlushType.None;
             //this._workingBuffer = new byte[WORKING_BUFFER_SIZE_DEFAULT];
-            this._stream = stream;
-            this._leaveOpen = leaveOpen;
-            this._compressionMode = compressionMode;
-            this._flavor = flavor;
-            this._level = level;
+            _stream = stream;
+            _leaveOpen = leaveOpen;
+            _compressionMode = compressionMode;
+            _flavor = flavor;
+            _level = level;
             // workitem 7159
             if (flavor == ZlibStreamFlavor.GZIP)
             {
@@ -80,7 +77,7 @@ namespace Ionic.Zlib
         }
 
 
-        protected internal bool _wantCompress => (this._compressionMode == CompressionMode.Compress);
+        protected internal bool _wantCompress => (_compressionMode == CompressionMode.Compress);
 
         private ZlibCodec z
         {
@@ -88,16 +85,16 @@ namespace Ionic.Zlib
             {
                 if (_z == null)
                 {
-                    var wantRfc1950Header = (this._flavor == ZlibStreamFlavor.ZLIB);
+                    var wantRfc1950Header = (_flavor == ZlibStreamFlavor.ZLIB);
                     _z = new ZlibCodec();
-                    if (this._compressionMode == CompressionMode.Decompress)
+                    if (_compressionMode == CompressionMode.Decompress)
                     {
                         _z.InitializeInflate(wantRfc1950Header);
                     }
                     else
                     {
                         _z.Strategy = Strategy;
-                        _z.InitializeDeflate(this._level, wantRfc1950Header);
+                        _z.InitializeDeflate(_level, wantRfc1950Header);
                     }
                 }
                 return _z;
@@ -313,7 +310,7 @@ namespace Ionic.Zlib
             _stream.Flush();
         }
 
-        public override long Seek(long offset, System.IO.SeekOrigin origin)
+        public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotImplementedException();
             //_outStream.Seek(offset, origin);
@@ -418,7 +415,7 @@ namespace Ionic.Zlib
 
             if (_streamMode == StreamMode.Undefined)
             {
-                if (!this._stream.CanRead) throw new ZlibException("The stream is not readable.");
+                if (!_stream.CanRead) throw new ZlibException("The stream is not readable.");
                 // for the first read, set up some controls.
                 _streamMode = StreamMode.Reader;
                 // (The first reference to _z goes through the private accessor which
@@ -522,11 +519,11 @@ namespace Ionic.Zlib
 
 
 
-        public override bool CanRead => this._stream.CanRead;
+        public override bool CanRead => _stream.CanRead;
 
-        public override bool CanSeek => this._stream.CanSeek;
+        public override bool CanSeek => _stream.CanSeek;
 
-        public override bool CanWrite => this._stream.CanWrite;
+        public override bool CanWrite => _stream.CanWrite;
 
         public override long Length => _stream.Length;
 
