@@ -78,7 +78,7 @@ namespace Ionic.Zlib
     /// <remarks>
     /// The different FlushType values are useful when using a Deflate in a streaming application.
     /// </remarks>
-    internal enum FlushType
+    public enum FlushType
     {
         /// <summary>No flush at all.</summary>
         None = 0,

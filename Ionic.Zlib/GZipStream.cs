@@ -81,7 +81,7 @@ namespace Ionic.Zlib
     ///
     /// <seealso cref="DeflateStream" />
     /// <seealso cref="ZlibStream" />
-    internal class GZipStream : System.IO.Stream
+    public class GZipStream : System.IO.Stream
     {
         // GZip format
         // source: http://tools.ietf.org/html/rfc1952

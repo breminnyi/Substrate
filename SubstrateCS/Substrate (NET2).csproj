@@ -235,19 +235,6 @@
     <Compile Include="Source\TileTick.cs" />
     <Compile Include="Source\Vector.cs" />
     <Compile Include="Source\World.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\Crc32.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\Deflate.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\DeflateStream.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\GZipStream.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\Inflate.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\InfTree.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\ParallelDeflateOutputStream.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\Tree.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\Zlib.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\ZlibBaseStream.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\ZlibCodec.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\ZlibConstants.cs" />
-    <Compile Include="Vendor\DotNetZip\Zlib\ZlibStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -286,7 +273,10 @@
     <Folder Include="Source\Util\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Vendor\DotNetZip\Zlib\LICENSE.txt" />
+    <ProjectReference Include="..\Ionic.Zlib\Ionic.Zlib.csproj">
+      <Project>{eb3b4c24-fc85-427e-90a1-ce744e93510d}</Project>
+      <Name>Ionic.Zlib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

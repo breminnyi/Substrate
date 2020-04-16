@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Substrate.Tests", "..\Substrate.Tests\Substrate.Tests.csproj", "{5D875E2D-AD97-43DB-9180-DBA3F26DC569}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ionic.Zlib", "..\Ionic.Zlib\Ionic.Zlib.csproj", "{EB3B4C24-FC85-427E-90A1-CE744E93510D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{5D875E2D-AD97-43DB-9180-DBA3F26DC569}.Debug|Any CPU.Build.0 = net40-client-Debug|Any CPU
 		{5D875E2D-AD97-43DB-9180-DBA3F26DC569}.Release|Any CPU.ActiveCfg = net40-client-Release|Any CPU
 		{5D875E2D-AD97-43DB-9180-DBA3F26DC569}.Release|Any CPU.Build.0 = net40-client-Release|Any CPU
+		{EB3B4C24-FC85-427E-90A1-CE744E93510D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB3B4C24-FC85-427E-90A1-CE744E93510D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB3B4C24-FC85-427E-90A1-CE744E93510D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB3B4C24-FC85-427E-90A1-CE744E93510D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -59,7 +59,7 @@ namespace Ionic.Zlib
     ///
     /// <seealso cref="DeflateStream" />
     /// <seealso cref="GZipStream" />
-    internal class DeflateStream : System.IO.Stream
+    public class DeflateStream : System.IO.Stream
     {
         internal ZlibBaseStream _baseStream;
         internal System.IO.Stream _innerStream;
