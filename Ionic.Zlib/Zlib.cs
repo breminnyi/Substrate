@@ -211,7 +211,7 @@ namespace Ionic.Zlib
         /// This ctor collects a message attached to the exception.
         /// </summary>
         /// <param name="s"></param>
-        public ZlibException(System.String s)
+        public ZlibException(string s)
             : base(s)
         {
         }
@@ -259,25 +259,25 @@ namespace Ionic.Zlib
         ///   count depending on the data available in the source TextReader. Returns -1
         ///   if the end of the stream is reached.
         /// </returns>
-        public static System.Int32 ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
+        public static int ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
         {
             // Returns 0 bytes if not enough space in target
             if (target.Length == 0) return 0;
 
-            char[] charArray = new char[target.Length];
-            int bytesRead = sourceTextReader.Read(charArray, start, count);
+            var charArray = new char[target.Length];
+            var bytesRead = sourceTextReader.Read(charArray, start, count);
 
             // Returns -1 if EOF
             if (bytesRead == 0) return -1;
 
-            for (int index = start; index < start + bytesRead; index++)
+            for (var index = start; index < start + bytesRead; index++)
                 target[index] = (byte)charArray[index];
 
             return bytesRead;
         }
 
 
-        internal static byte[] ToByteArray(System.String sourceString)
+        internal static byte[] ToByteArray(string sourceString)
         {
             return System.Text.UTF8Encoding.UTF8.GetBytes(sourceString);
         }
@@ -408,12 +408,12 @@ namespace Ionic.Zlib
             if (buf == null)
                 return 1;
 
-            uint s1 = (uint) (adler & 0xffff);
-            uint s2 = (uint) ((adler >> 16) & 0xffff);
+            var s1 = (uint) (adler & 0xffff);
+            var s2 = (uint) ((adler >> 16) & 0xffff);
 
             while (len > 0)
             {
-                int k = len < NMAX ? len : NMAX;
+                var k = len < NMAX ? len : NMAX;
                 len -= k;
                 while (k >= 16)
                 {

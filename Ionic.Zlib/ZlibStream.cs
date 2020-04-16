@@ -323,7 +323,7 @@ namespace Ionic.Zlib
         /// </summary>
         virtual public FlushType FlushMode
         {
-            get { return (this._baseStream._flushMode); }
+            get => (this._baseStream._flushMode);
             set
             {
                 if (_disposed) throw new ObjectDisposedException("ZlibStream");
@@ -350,32 +350,23 @@ namespace Ionic.Zlib
         /// </remarks>
         public int BufferSize
         {
-            get
-            {
-                return this._baseStream._bufferSize;
-            }
+            get => this._baseStream._bufferSize;
             set
             {
                 if (_disposed) throw new ObjectDisposedException("ZlibStream");
                 if (this._baseStream._workingBuffer != null)
                     throw new ZlibException("The working buffer is already set.");
                 if (value < ZlibConstants.WorkingBufferSizeMin)
-                    throw new ZlibException(String.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
+                    throw new ZlibException(string.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
                 this._baseStream._bufferSize = value;
             }
         }
 
         /// <summary> Returns the total number of bytes input so far.</summary>
-        virtual public long TotalIn
-        {
-            get { return this._baseStream._z.TotalBytesIn; }
-        }
+        virtual public long TotalIn => this._baseStream._z.TotalBytesIn;
 
         /// <summary> Returns the total number of bytes output so far.</summary>
-        virtual public long TotalOut
-        {
-            get { return this._baseStream._z.TotalBytesOut; }
-        }
+        virtual public long TotalOut => this._baseStream._z.TotalBytesOut;
 
         #endregion
 
@@ -427,10 +418,7 @@ namespace Ionic.Zlib
         /// <remarks>
         /// Always returns false.
         /// </remarks>
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
 
         /// <summary>
         /// Indicates whether the stream can be written.
@@ -459,10 +447,7 @@ namespace Ionic.Zlib
         /// <summary>
         /// Reading this property always throws a <see cref="NotImplementedException"/>.
         /// </summary>
-        public override long Length
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override long Length => throw new NotImplementedException();
 
         /// <summary>
         ///   The position of the stream pointer.
@@ -486,7 +471,7 @@ namespace Ionic.Zlib
                 return 0;
             }
 
-            set { throw new NotImplementedException(); }
+            set => throw new NotImplementedException();
         }
 
         /// <summary>
@@ -588,7 +573,7 @@ namespace Ionic.Zlib
         /// </param>
         ///
         /// <returns>The string in compressed form</returns>
-        public static byte[] CompressString(String s)
+        public static byte[] CompressString(string s)
         {
             using (var ms = new MemoryStream())
             {
@@ -641,7 +626,7 @@ namespace Ionic.Zlib
         /// </param>
         ///
         /// <returns>The uncompressed string</returns>
-        public static String UncompressString(byte[] compressed)
+        public static string UncompressString(byte[] compressed)
         {
             using (var input = new MemoryStream(compressed))
             {

@@ -58,32 +58,20 @@ namespace Ionic.Zlib
         /// indicates the total number of bytes read on the CRC stream.
         /// This is used when writing the ZipDirEntry when compressing files.
         /// </summary>
-        public Int64 TotalBytesRead
-        {
-            get
-            {
-                return _TotalBytesRead;
-            }
-        }
+        public long TotalBytesRead => _TotalBytesRead;
 
         /// <summary>
         /// Indicates the current CRC for all blocks slurped in.
         /// </summary>
-        public Int32 Crc32Result
-        {
-            get
-            {
-                // return one's complement of the running result
-                return unchecked((Int32)(~_RunningCrc32Result));
-            }
-        }
+        // return one's complement of the running result
+        public int Crc32Result => unchecked((int)(~_RunningCrc32Result));
 
         /// <summary>
         /// Returns the CRC32 for the specified stream.
         /// </summary>
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <returns>the CRC32 calculation</returns>
-        public Int32 GetCrc32(System.IO.Stream input)
+        public int GetCrc32(System.IO.Stream input)
         {
             return GetCrc32AndCopy(input, null);
         }
@@ -95,7 +83,7 @@ namespace Ionic.Zlib
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <param name="output">The stream into which to deflate the input</param>
         /// <returns>the CRC32 calculation</returns>
-        public Int32 GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
+        public int GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
         {
             if (input == null)
                 throw new ZlibException("The input stream must not be null.");
@@ -104,11 +92,11 @@ namespace Ionic.Zlib
             {
                 //UInt32 crc32Result;
                 //crc32Result = 0xFFFFFFFF;
-                byte[] buffer = new byte[BUFFER_SIZE];
-                int readSize = BUFFER_SIZE;
+                var buffer = new byte[BUFFER_SIZE];
+                var readSize = BUFFER_SIZE;
 
                 _TotalBytesRead = 0;
-                int count = input.Read(buffer, 0, readSize);
+                var count = input.Read(buffer, 0, readSize);
                 if (output != null) output.Write(buffer, 0, count);
                 _TotalBytesRead += count;
                 while (count > 0)
@@ -119,7 +107,7 @@ namespace Ionic.Zlib
                     _TotalBytesRead += count;
                 }
 
-                return (Int32)(~_RunningCrc32Result);
+                return (int)(~_RunningCrc32Result);
             }
         }
 
@@ -131,14 +119,14 @@ namespace Ionic.Zlib
         /// <param name="W">The word to start with.</param>
         /// <param name="B">The byte to combine it with.</param>
         /// <returns>The CRC-ized result.</returns>
-        public Int32 ComputeCrc32(Int32 W, byte B)
+        public int ComputeCrc32(int W, byte B)
         {
-            return _InternalComputeCrc32((UInt32)W, B);
+            return _InternalComputeCrc32((uint)W, B);
         }
 
-        internal Int32 _InternalComputeCrc32(UInt32 W, byte B)
+        internal int _InternalComputeCrc32(uint W, byte B)
         {
-            return (Int32)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
+            return (int)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
         }
 
         /// <summary>
@@ -153,9 +141,9 @@ namespace Ionic.Zlib
             if (block == null)
                 throw new ZlibException("The data buffer must not be null.");
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                int x = offset + i;
+                var x = offset + i;
                 _RunningCrc32Result = ((_RunningCrc32Result) >> 8) ^ crc32Table[(block[x]) ^ ((_RunningCrc32Result) & 0x000000FF)];
             }
             _TotalBytesRead += count;
@@ -172,12 +160,12 @@ namespace Ionic.Zlib
                 // bzip2, gzip, and others.
                 // Often the polynomial is shown reversed as 0x04C11DB7.
                 // For more details, see http://en.wikipedia.org/wiki/Cyclic_redundancy_check
-                UInt32 dwPolynomial = 0xEDB88320;
-                UInt32 i, j;
+                var dwPolynomial = 0xEDB88320;
+                uint i, j;
 
-                crc32Table = new UInt32[256];
+                crc32Table = new uint[256];
 
-                UInt32 dwCrc;
+                uint dwCrc;
                 for (i = 0; i < 256; i++)
                 {
                     dwCrc = i;
@@ -203,7 +191,7 @@ namespace Ionic.Zlib
         private uint gf2_matrix_times(uint[] matrix, uint vec)
         {
             uint sum = 0;
-            int i=0;
+            var i=0;
             while (vec != 0)
             {
                 if ((vec & 0x01)== 0x01)
@@ -216,7 +204,7 @@ namespace Ionic.Zlib
 
         private void gf2_matrix_square(uint[] square, uint[] mat)
         {
-            for (int i = 0; i < 32; i++)
+            for (var i = 0; i < 32; i++)
                 square[i] = gf2_matrix_times(mat, mat[i]);
         }
 
@@ -234,19 +222,19 @@ namespace Ionic.Zlib
         /// <param name="length">the length of data the CRC value was calculated on</param>
         public void Combine(int crc, int length)
         {
-            uint[] even = new uint[32];     // even-power-of-two zeros operator
-            uint[] odd = new uint[32];      // odd-power-of-two zeros operator
+            var even = new uint[32];     // even-power-of-two zeros operator
+            var odd = new uint[32];      // odd-power-of-two zeros operator
 
             if (length == 0)
                 return;
 
-            uint crc1= ~_RunningCrc32Result;
-            uint crc2= (uint) crc;
+            var crc1= ~_RunningCrc32Result;
+            var crc2= (uint) crc;
 
             // put operator for one zero bit in odd
             odd[0] = 0xEDB88320;  // the CRC-32 polynomial
             uint row = 1;
-            for (int i = 1; i < 32; i++)
+            for (var i = 1; i < 32; i++)
             {
                 odd[i] = row;
                 row <<= 1;
@@ -258,7 +246,7 @@ namespace Ionic.Zlib
             // put operator for four zero bits in odd
             gf2_matrix_square(odd, even);
 
-            uint len2 = (uint) length;
+            var len2 = (uint) length;
 
             // apply len2 zeros to crc1 (first square will put the operator for one
             // zero byte, eight zero bits, in even)
@@ -293,10 +281,10 @@ namespace Ionic.Zlib
 
 
         // private member vars
-        private Int64 _TotalBytesRead;
-        private static readonly UInt32[] crc32Table;
+        private long _TotalBytesRead;
+        private static readonly uint[] crc32Table;
         private const int BUFFER_SIZE = 8192;
-        private UInt32 _RunningCrc32Result = 0xFFFFFFFF;
+        private uint _RunningCrc32Result = 0xFFFFFFFF;
 
     }
 
@@ -324,11 +312,11 @@ namespace Ionic.Zlib
     /// </remarks>
     internal class CrcCalculatorStream : System.IO.Stream, System.IDisposable
     {
-        private static readonly Int64 UnsetLengthLimit = -99;
+        private static readonly long UnsetLengthLimit = -99;
 
         internal System.IO.Stream _innerStream;
         private CRC32 _Crc32;
-        private Int64 _lengthLimit = -99;
+        private long _lengthLimit = -99;
         private bool _leaveOpen;
 
         /// <summary>
@@ -339,10 +327,7 @@ namespace Ionic.Zlib
         /// This is either the total number of bytes read, or the total number of bytes
         /// written, depending on the direction of this stream.
         /// </remarks>
-        public Int64 TotalBytesSlurped
-        {
-            get { return _Crc32.TotalBytesRead; }
-        }
+        public long TotalBytesSlurped => _Crc32.TotalBytesRead;
 
 
         /// <summary>
@@ -381,7 +366,7 @@ namespace Ionic.Zlib
         /// </remarks>
         /// <param name="stream">The underlying stream</param>
         /// <param name="length">The length of the stream to slurp</param>
-        public CrcCalculatorStream(System.IO.Stream stream, Int64 length)
+        public CrcCalculatorStream(System.IO.Stream stream, long length)
             : this(true, length, stream)
         {
             if (length < 0)
@@ -396,7 +381,7 @@ namespace Ionic.Zlib
         /// <param name="length">The length of the stream to slurp</param>
         /// <param name="leaveOpen">true to leave the underlying stream
         /// open upon close of the CrcCalculatorStream.; false otherwise.</param>
-        public CrcCalculatorStream(System.IO.Stream stream, Int64 length, bool leaveOpen)
+        public CrcCalculatorStream(System.IO.Stream stream, long length, bool leaveOpen)
             : this(leaveOpen, length, stream)
         {
             if (length < 0)
@@ -409,7 +394,7 @@ namespace Ionic.Zlib
         // is no length set.  So we validate the length limit in those ctors that use an
         // explicit param, otherwise we don't validate, because it could be our special
         // value.
-        private CrcCalculatorStream(bool leaveOpen, Int64 length, System.IO.Stream stream)
+        private CrcCalculatorStream(bool leaveOpen, long length, System.IO.Stream stream)
             : base()
         {
             _innerStream = stream;
@@ -421,10 +406,7 @@ namespace Ionic.Zlib
         /// <summary>
         /// Provides the current CRC for all blocks slurped in.
         /// </summary>
-        public Int32 Crc
-        {
-            get { return _Crc32.Crc32Result; }
-        }
+        public int Crc => _Crc32.Crc32Result;
 
         /// <summary>
         /// Indicates whether the underlying stream will be left open when the
@@ -432,8 +414,8 @@ namespace Ionic.Zlib
         /// </summary>
         public bool LeaveOpen
         {
-            get { return _leaveOpen; }
-            set { _leaveOpen = value; }
+            get => _leaveOpen;
+            set => _leaveOpen = value;
         }
 
         /// <summary>
@@ -445,7 +427,7 @@ namespace Ionic.Zlib
         /// <returns>the number of bytes actually read</returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int bytesToRead = count;
+            var bytesToRead = count;
 
             // Need to limit the # of bytes returned, if the stream is intended to have
             // a definite length.  This is especially useful when returning a stream for
@@ -458,10 +440,10 @@ namespace Ionic.Zlib
             if (_lengthLimit != CrcCalculatorStream.UnsetLengthLimit)
             {
                 if (_Crc32.TotalBytesRead >= _lengthLimit) return 0; // EOF
-                Int64 bytesRemaining = _lengthLimit - _Crc32.TotalBytesRead;
+                var bytesRemaining = _lengthLimit - _Crc32.TotalBytesRead;
                 if (bytesRemaining < count) bytesToRead = (int)bytesRemaining;
             }
-            int n = _innerStream.Read(buffer, offset, bytesToRead);
+            var n = _innerStream.Read(buffer, offset, bytesToRead);
             if (n > 0) _Crc32.SlurpBlock(buffer, offset, n);
             return n;
         }
@@ -481,26 +463,17 @@ namespace Ionic.Zlib
         /// <summary>
         /// Indicates whether the stream supports reading.
         /// </summary>
-        public override bool CanRead
-        {
-            get { return _innerStream.CanRead; }
-        }
+        public override bool CanRead => _innerStream.CanRead;
 
         /// <summary>
         /// Indicates whether the stream supports seeking.
         /// </summary>
-        public override bool CanSeek
-        {
-            get { return _innerStream.CanSeek; }
-        }
+        public override bool CanSeek => _innerStream.CanSeek;
 
         /// <summary>
         /// Indicates whether the stream supports writing.
         /// </summary>
-        public override bool CanWrite
-        {
-            get { return _innerStream.CanWrite; }
-        }
+        public override bool CanWrite => _innerStream.CanWrite;
 
         /// <summary>
         /// Flush the stream.
@@ -528,8 +501,8 @@ namespace Ionic.Zlib
         /// </summary>
         public override long Position
         {
-            get { return _Crc32.TotalBytesRead; }
-            set { throw new NotImplementedException(); }
+            get => _Crc32.TotalBytesRead;
+            set => throw new NotImplementedException();
         }
 
         /// <summary>

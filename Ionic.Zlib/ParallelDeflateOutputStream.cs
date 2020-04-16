@@ -40,7 +40,7 @@ namespace Ionic.Zlib
             {
                 buffer= new byte[size];
                 // alloc 5 bytes overhead for every block (margin of safety= 2)
-                int n = size + ((size / 32768)+1) * 5 * 2;
+                var n = size + ((size / 32768)+1) * 5 * 2;
                 compressed= new byte[n];
 
                 status = (int)Status.None;
@@ -109,10 +109,10 @@ namespace Ionic.Zlib
         private bool                        _firstWriteDone;
         private int                         _pc;
         private int                         _Crc32;
-        private Int64                       _totalBytesProcessed;
+        private long                       _totalBytesProcessed;
         private Ionic.Zlib.CompressionLevel _compressLevel;
         private volatile Exception          _pendingException;
-        private object                      _eLock = new Object();  // protects _pendingException
+        private object                      _eLock = new object();  // protects _pendingException
 
         // This bitfield is used only when Trace is defined.
         //private TraceBits _DesiredTrace = TraceBits.Write | TraceBits.WriteBegin |
@@ -380,7 +380,7 @@ namespace Ionic.Zlib
         /// </remarks>
         public int BufferSize
         {
-            get { return _bufferSize;}
+            get => _bufferSize;
             set
             {
                 if (value < 1024)
@@ -395,7 +395,7 @@ namespace Ionic.Zlib
         /// <remarks>
         /// This value is meaningful only after a call to Close().
         /// </remarks>
-        public int Crc32 { get { return _Crc32; } }
+        public int Crc32 => _Crc32;
 
 
         /// <summary>
@@ -404,17 +404,17 @@ namespace Ionic.Zlib
         /// <remarks>
         /// This value is meaningful only after a call to Close().
         /// </remarks>
-        public Int64 BytesProcessed { get { return _totalBytesProcessed; } }
+        public long BytesProcessed => _totalBytesProcessed;
 
 
         private void _InitializePoolOfWorkItems()
         {
             _pool = new System.Collections.Generic.List<WorkItem>();
-            for(int i=0; i < BuffersPerCore * Environment.ProcessorCount; i++)
+            for(var i=0; i < BuffersPerCore * Environment.ProcessorCount; i++)
                 _pool.Add(new WorkItem(_bufferSize, _compressLevel, Strategy));
             _pc = _pool.Count;
 
-            for(int i=0; i < _pc; i++)
+            for(var i=0; i < _pc; i++)
                 _pool[i].index= i;
 
             // set the pointers
@@ -485,8 +485,8 @@ namespace Ionic.Zlib
 
             do
             {
-                int ix = _nextToFill % _pc;
-                WorkItem workitem = _pool[ix];
+                var ix = _nextToFill % _pc;
+                var workitem = _pool[ix];
                 lock(workitem)
                 {
                     TraceOutput(TraceBits.Fill,
@@ -503,7 +503,7 @@ namespace Ionic.Zlib
                         workitem.status == (int)WorkItem.Status.Filling)
                     {
                         workitem.status = (int)WorkItem.Status.Filling;
-                        int limit = ((workitem.buffer.Length - workitem.inputBytesAvailable) > count)
+                        var limit = ((workitem.buffer.Length - workitem.inputBytesAvailable) > count)
                             ? count
                             : (workitem.buffer.Length - workitem.inputBytesAvailable);
 
@@ -537,7 +537,7 @@ namespace Ionic.Zlib
                     }
                     else
                     {
-                        int wcycles= 0;
+                        var wcycles= 0;
 
                         while (workitem.status != (int)WorkItem.Status.None &&
                                workitem.status != (int)WorkItem.Status.Done &&
@@ -589,7 +589,7 @@ namespace Ionic.Zlib
                 throw new NotSupportedException();
 
             // pass any partial buffer out to the compressor workers:
-            WorkItem workitem = _pool[_nextToFill % _pc];
+            var workitem = _pool[_nextToFill % _pc];
             lock(workitem)
             {
                 if ( workitem.status == (int)WorkItem.Status.Filling)
@@ -645,7 +645,7 @@ namespace Ionic.Zlib
             //System.Console.WriteLine(st.ToString());
 
             // need to get Writer off the workitem, in case he's waiting forever
-            WorkItem workitem = _pool[_nextToFill % _pc];
+            var workitem = _pool[_nextToFill % _pc];
             lock(workitem)
             {
                 Monitor.PulseAll(workitem);
@@ -811,7 +811,7 @@ namespace Ionic.Zlib
 
                     // repeatedly write buffers as they become ready
                     WorkItem workitem = null;
-                    Ionic.Zlib.CRC32 c= new Ionic.Zlib.CRC32();
+                    var c= new Ionic.Zlib.CRC32();
                     do
                     {
                         workitem = _pool[_nextToWrite % _pc];
@@ -855,7 +855,7 @@ namespace Ionic.Zlib
                                 }
                                 else
                                 {
-                                    int wcycles = 0;
+                                    var wcycles = 0;
                                     // I've locked a workitem I cannot use.
                                     // Therefore, wake someone else up, and then release the lock.
                                     while (workitem.status != (int)WorkItem.Status.Compressed)
@@ -910,9 +910,9 @@ namespace Ionic.Zlib
                     // After writing a series of buffers, closing each one with
                     // Flush.Sync, we now write the final one as Flush.Finish, and
                     // then stop.
-                    byte[] buffer = new byte[128];
-                    ZlibCodec compressor = new ZlibCodec();
-                    int rc = compressor.InitializeDeflate(_compressLevel, false);
+                    var buffer = new byte[128];
+                    var compressor = new ZlibCodec();
+                    var rc = compressor.InitializeDeflate(_compressLevel, false);
                     compressor.InputBuffer = null;
                     compressor.NextIn = 0;
                     compressor.AvailableBytesIn = 0;
@@ -962,20 +962,20 @@ namespace Ionic.Zlib
 
 
 
-        private void _DeflateOne(Object wi)
+        private void _DeflateOne(object wi)
         {
-            WorkItem workitem = (WorkItem) wi;
+            var workitem = (WorkItem) wi;
             try
             {
                 // compress one buffer
-                int myItem = workitem.index;
+                var myItem = workitem.index;
 
                 lock(workitem)
                 {
                     if (workitem.status != (int)WorkItem.Status.Filled)
                         throw new InvalidOperationException();
 
-                    Ionic.Zlib.CRC32 crc = new CRC32();
+                    var crc = new CRC32();
 
                     // use the workitem:
                     // calc CRC on the buffer
@@ -1015,8 +1015,8 @@ namespace Ionic.Zlib
 
         private bool DeflateOneSegment(WorkItem workitem)
         {
-            ZlibCodec compressor = workitem.compressor;
-            int rc= 0;
+            var compressor = workitem.compressor;
+            var rc= 0;
             compressor.ResetDeflate();
             compressor.NextIn = 0;
 
@@ -1046,7 +1046,7 @@ namespace Ionic.Zlib
             {
                 lock(_outputLock)
                 {
-                    int tid = Thread.CurrentThread.GetHashCode();
+                    var tid = Thread.CurrentThread.GetHashCode();
                     Console.ForegroundColor = (ConsoleColor) (tid % 8 + 8);
                     Console.Write("{0:000} PDOS ", tid);
                     Console.WriteLine(format, varParams);
@@ -1082,10 +1082,7 @@ namespace Ionic.Zlib
         /// <remarks>
         /// Always returns false.
         /// </remarks>
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
 
 
         /// <summary>
@@ -1094,10 +1091,7 @@ namespace Ionic.Zlib
         /// <remarks>
         /// Always returns false.
         /// </remarks>
-        public override bool CanRead
-        {
-            get {return false;}
-        }
+        public override bool CanRead => false;
 
         /// <summary>
         /// Indicates whether the stream supports Write operations.
@@ -1105,26 +1099,20 @@ namespace Ionic.Zlib
         /// <remarks>
         /// Returns true if the provided stream is writable.
         /// </remarks>
-        public override bool CanWrite
-        {
-            get { return _outStream.CanWrite; }
-        }
+        public override bool CanWrite => _outStream.CanWrite;
 
         /// <summary>
         /// Reading this property always throws a NotImplementedException.
         /// </summary>
-        public override long Length
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override long Length => throw new NotImplementedException();
 
         /// <summary>
         /// Reading or Writing this property always throws a NotImplementedException.
         /// </summary>
         public override long Position
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         /// <summary>

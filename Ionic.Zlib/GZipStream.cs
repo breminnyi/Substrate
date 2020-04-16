@@ -141,12 +141,9 @@ namespace Ionic.Zlib
         ///   (<c>Nothing</c> in VB).
         /// </para>
         /// </remarks>
-        public String Comment
+        public string Comment
         {
-            get
-            {
-                return _Comment;
-            }
+            get => _Comment;
             set
             {
                 if (_disposed) throw new ObjectDisposedException("GZipStream");
@@ -177,9 +174,9 @@ namespace Ionic.Zlib
         ///   in VB).
         /// </para>
         /// </remarks>
-        public String FileName
+        public string FileName
         {
-            get { return _FileName; }
+            get => _FileName;
             set
             {
                 if (_disposed) throw new ObjectDisposedException("GZipStream");
@@ -217,7 +214,7 @@ namespace Ionic.Zlib
         /// <remarks>
         /// This is used for internal error checking. You probably don't need to look at this property.
         /// </remarks>
-        public int Crc32 { get { return _Crc32; } }
+        public int Crc32 => _Crc32;
 
         private int _headerByteCount;
         internal ZlibBaseStream _baseStream;
@@ -546,7 +543,7 @@ namespace Ionic.Zlib
         /// </summary>
         public virtual FlushType FlushMode
         {
-            get { return (this._baseStream._flushMode); }
+            get => (this._baseStream._flushMode);
             set {
                 if (_disposed) throw new ObjectDisposedException("GZipStream");
                 this._baseStream._flushMode = value;
@@ -572,39 +569,24 @@ namespace Ionic.Zlib
         /// </remarks>
         public int BufferSize
         {
-            get
-            {
-                return this._baseStream._bufferSize;
-            }
+            get => this._baseStream._bufferSize;
             set
             {
                 if (_disposed) throw new ObjectDisposedException("GZipStream");
                 if (this._baseStream._workingBuffer != null)
                     throw new ZlibException("The working buffer is already set.");
                 if (value < ZlibConstants.WorkingBufferSizeMin)
-                    throw new ZlibException(String.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
+                    throw new ZlibException(string.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
                 this._baseStream._bufferSize = value;
             }
         }
 
 
         /// <summary> Returns the total number of bytes input so far.</summary>
-        public virtual long TotalIn
-        {
-            get
-            {
-                return this._baseStream._z.TotalBytesIn;
-            }
-        }
+        public virtual long TotalIn => this._baseStream._z.TotalBytesIn;
 
         /// <summary> Returns the total number of bytes output so far.</summary>
-        public virtual long TotalOut
-        {
-            get
-            {
-                return this._baseStream._z.TotalBytesOut;
-            }
-        }
+        public virtual long TotalOut => this._baseStream._z.TotalBytesOut;
 
         #endregion
 
@@ -659,10 +641,7 @@ namespace Ionic.Zlib
         /// <remarks>
         /// Always returns false.
         /// </remarks>
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
 
 
         /// <summary>
@@ -692,10 +671,7 @@ namespace Ionic.Zlib
         /// <summary>
         /// Reading this property always throws a <see cref="NotImplementedException"/>.
         /// </summary>
-        public override long Length
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override long Length => throw new NotImplementedException();
 
         /// <summary>
         ///   The position of the stream pointer.
@@ -719,7 +695,7 @@ namespace Ionic.Zlib
                 return 0;
             }
 
-            set { throw new NotImplementedException(); }
+            set => throw new NotImplementedException();
         }
 
         /// <summary>
@@ -756,7 +732,7 @@ namespace Ionic.Zlib
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (_disposed) throw new ObjectDisposedException("GZipStream");
-            int n = _baseStream.Read(buffer, offset, count);
+            var n = _baseStream.Read(buffer, offset, count);
 
             // Console.WriteLine("GZipStream::Read(buffer, off({0}), c({1}) = {2}", offset, count, n);
             // Console.WriteLine( Util.FormatByteArray(buffer, offset, n) );
@@ -842,15 +818,15 @@ namespace Ionic.Zlib
 
         private int EmitHeader()
         {
-            byte[] commentBytes = (Comment == null) ? null : iso8859dash1.GetBytes(Comment);
-            byte[] filenameBytes = (FileName == null) ? null : iso8859dash1.GetBytes(FileName);
+            var commentBytes = (Comment == null) ? null : iso8859dash1.GetBytes(Comment);
+            var filenameBytes = (FileName == null) ? null : iso8859dash1.GetBytes(FileName);
 
-            int cbLength = (Comment == null) ? 0 : commentBytes.Length + 1;
-            int fnLength = (FileName == null) ? 0 : filenameBytes.Length + 1;
+            var cbLength = (Comment == null) ? 0 : commentBytes.Length + 1;
+            var fnLength = (FileName == null) ? 0 : filenameBytes.Length + 1;
 
-            int bufferLength = 10 + cbLength + fnLength;
-            byte[] header = new byte[bufferLength];
-            int i = 0;
+            var bufferLength = 10 + cbLength + fnLength;
+            var header = new byte[bufferLength];
+            var i = 0;
             // ID
             header[i++] = 0x1F;
             header[i++] = 0x8B;
@@ -868,8 +844,8 @@ namespace Ionic.Zlib
 
             // mtime
             if (!LastModified.HasValue) LastModified = DateTime.Now;
-            System.TimeSpan delta = LastModified.Value - _unixEpoch;
-            Int32 timet = (Int32)delta.TotalSeconds;
+            var delta = LastModified.Value - _unixEpoch;
+            var timet = (int)delta.TotalSeconds;
             Array.Copy(BitConverter.GetBytes(timet), 0, header, i, 4);
             i += 4;
 
@@ -922,7 +898,7 @@ namespace Ionic.Zlib
         /// </param>
         ///
         /// <returns>The string in compressed form</returns>
-        public static byte[] CompressString(String s)
+        public static byte[] CompressString(string s)
         {
             using (var ms = new MemoryStream())
             {
@@ -975,7 +951,7 @@ namespace Ionic.Zlib
         /// </param>
         ///
         /// <returns>The uncompressed string</returns>
-        public static String UncompressString(byte[] compressed)
+        public static string UncompressString(byte[] compressed)
         {
             using (var input = new MemoryStream(compressed))
             {
