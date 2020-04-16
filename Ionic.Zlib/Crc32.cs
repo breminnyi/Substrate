@@ -33,6 +33,7 @@
 // ------------------------------------------------------------------
 
 
+using System.IO;
 using Interop=System.Runtime.InteropServices;
 
 
@@ -50,13 +51,13 @@ namespace Ionic.Zlib
 #if !NETCF
     [Interop.ClassInterface(Interop.ClassInterfaceType.AutoDispatch)]
 #endif
-    internal class CRC32
+    internal class Crc32
     {
         /// <summary>
         /// indicates the total number of bytes read on the CRC stream.
         /// This is used when writing the ZipDirEntry when compressing files.
         /// </summary>
-        public long TotalBytesRead => _TotalBytesRead;
+        public long TotalBytesRead { get; private set; }
 
         /// <summary>
         /// Indicates the current CRC for all blocks slurped in.
@@ -69,7 +70,7 @@ namespace Ionic.Zlib
         /// </summary>
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <returns>the CRC32 calculation</returns>
-        public int GetCrc32(System.IO.Stream input)
+        public int GetCrc32(Stream input)
         {
             return GetCrc32AndCopy(input, null);
         }
@@ -81,7 +82,7 @@ namespace Ionic.Zlib
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <param name="output">The stream into which to deflate the input</param>
         /// <returns>the CRC32 calculation</returns>
-        public int GetCrc32AndCopy(System.IO.Stream input, System.IO.Stream output)
+        public int GetCrc32AndCopy(Stream input, Stream output)
         {
             if (input == null)
                 throw new ZlibException("The input stream must not be null.");
@@ -93,16 +94,16 @@ namespace Ionic.Zlib
                 var buffer = new byte[BUFFER_SIZE];
                 var readSize = BUFFER_SIZE;
 
-                _TotalBytesRead = 0;
+                TotalBytesRead = 0;
                 var count = input.Read(buffer, 0, readSize);
                 if (output != null) output.Write(buffer, 0, count);
-                _TotalBytesRead += count;
+                TotalBytesRead += count;
                 while (count > 0)
                 {
                     SlurpBlock(buffer, 0, count);
                     count = input.Read(buffer, 0, readSize);
                     if (output != null) output.Write(buffer, 0, count);
-                    _TotalBytesRead += count;
+                    TotalBytesRead += count;
                 }
 
                 return (int)(~_RunningCrc32Result);
@@ -144,12 +145,12 @@ namespace Ionic.Zlib
                 var x = offset + i;
                 _RunningCrc32Result = ((_RunningCrc32Result) >> 8) ^ crc32Table[(block[x]) ^ ((_RunningCrc32Result) & 0x000000FF)];
             }
-            _TotalBytesRead += count;
+            TotalBytesRead += count;
         }
 
 
         // pre-initialize the crc table for speed of lookup.
-        static CRC32()
+        static Crc32()
         {
             unchecked
             {
@@ -279,7 +280,6 @@ namespace Ionic.Zlib
 
 
         // private member vars
-        private long _TotalBytesRead;
         private static readonly uint[] crc32Table;
         private const int BUFFER_SIZE = 8192;
         private uint _RunningCrc32Result = 0xFFFFFFFF;

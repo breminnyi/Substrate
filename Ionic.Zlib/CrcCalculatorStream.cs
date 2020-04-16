@@ -26,7 +26,7 @@ namespace Ionic.Zlib
         private static readonly long UnsetLengthLimit = -99;
 
         internal System.IO.Stream _innerStream;
-        private CRC32 _Crc32;
+        private Crc32 _Crc32;
         private long _lengthLimit = -99;
         private bool _leaveOpen;
 
@@ -109,7 +109,7 @@ namespace Ionic.Zlib
             : base()
         {
             _innerStream = stream;
-            _Crc32 = new CRC32();
+            _Crc32 = new Crc32();
             _lengthLimit = length;
             _leaveOpen = leaveOpen;
         }

@@ -784,7 +784,7 @@ namespace Ionic.Zlib
 
                     // repeatedly write buffers as they become ready
                     WorkItem workitem = null;
-                    var c= new CRC32();
+                    var c= new Crc32();
                     do
                     {
                         workitem = _pool[_nextToWrite % _pc];
@@ -948,7 +948,7 @@ namespace Ionic.Zlib
                     if (workitem.status != (int)WorkItem.Status.Filled)
                         throw new InvalidOperationException();
 
-                    var crc = new CRC32();
+                    var crc = new Crc32();
 
                     // use the workitem:
                     // calc CRC on the buffer

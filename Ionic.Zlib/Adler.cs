@@ -9,7 +9,7 @@ namespace Ionic.Zlib
     /// is a required part of the "ZLIB" standard.  Applications will almost never need to
     /// use this class directly.
     /// </remarks>
-    internal sealed class Adler
+    internal static class Adler
     {
         // largest prime smaller than 65536
         private static readonly uint BASE = 65521;
