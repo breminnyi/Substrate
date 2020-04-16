@@ -16,7 +16,7 @@ namespace Ionic.Zlib
         // NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
         private static readonly int NMAX = 5552;
 
-        static internal uint Adler32(uint adler, byte[] buf, int index, int len)
+        internal static uint Adler32(uint adler, byte[] buf, int index, int len)
         {
             if (buf == null)
                 return 1;
