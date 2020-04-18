@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Substrate.Tests", "..\Subst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ionic.Zlib", "..\Ionic.Zlib\Ionic.Zlib.csproj", "{EB3B4C24-FC85-427E-90A1-CE744E93510D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BF24B30E-FACC-4FB6-B1DA-845CDFDF610F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ionic.Zlib.Tests", "..\Tests\Ionic.Zlib.Tests\Ionic.Zlib.Tests.csproj", "{849C3857-A474-425B-BDFE-9A7A3DDC316F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,8 +33,15 @@ Global
 		{EB3B4C24-FC85-427E-90A1-CE744E93510D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB3B4C24-FC85-427E-90A1-CE744E93510D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB3B4C24-FC85-427E-90A1-CE744E93510D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{849C3857-A474-425B-BDFE-9A7A3DDC316F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{849C3857-A474-425B-BDFE-9A7A3DDC316F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{849C3857-A474-425B-BDFE-9A7A3DDC316F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{849C3857-A474-425B-BDFE-9A7A3DDC316F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{849C3857-A474-425B-BDFE-9A7A3DDC316F} = {BF24B30E-FACC-4FB6-B1DA-845CDFDF610F}
 	EndGlobalSection
 EndGlobal
