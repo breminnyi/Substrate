@@ -1,3 +1,5 @@
+using System;
+
 namespace Ionic.Zlib
 {
     public class Crc16
@@ -26,12 +28,12 @@ namespace Ionic.Zlib
             }
         }
         
-        public ushort Compute(byte[] block)
+        public byte[] Compute(byte[] block)
         {
             return Compute(block, 0, block.Length);
         }
 
-        public ushort Compute(byte[] block, int offset, int count)
+        public byte[] Compute(byte[] block, int offset, int count)
         {
             ushort crc = 0;
             // ReSharper disable once ForCanBeConvertedToForeach
@@ -41,7 +43,7 @@ namespace Ionic.Zlib
                 crc = unchecked((ushort) ((crc << 8) ^ _lookupTable[data]));
             }
 
-            return crc;
+            return BitConverter.GetBytes(crc);
         }
     }
 }

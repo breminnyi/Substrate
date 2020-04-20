@@ -13,7 +13,7 @@ namespace Ionic.Zlib
         {
             var crc8 = new Crc8(generator);
             var actual = crc8.Compute(input);
-            Assert.Equal(expected, actual);
+            Assert.Equal<byte>(new[] {expected}, actual);
         }
     }
 }

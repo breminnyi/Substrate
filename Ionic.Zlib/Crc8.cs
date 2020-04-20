@@ -29,12 +29,12 @@ namespace Ionic.Zlib
             }
         }
 
-        public byte Compute(byte[] block)
+        public byte[] Compute(byte[] block)
         {
             return Compute(block, 0, block.Length);
         }
 
-        public byte Compute(byte[] block, int offset, int count)
+        public byte[] Compute(byte[] block, int offset, int count)
         {
             byte crc = 0;
             // ReSharper disable once ForCanBeConvertedToForeach
@@ -44,7 +44,7 @@ namespace Ionic.Zlib
                 crc = _lookupTable[data];
             }
 
-            return crc;
+            return new[] {crc};
         }
     }
 }
