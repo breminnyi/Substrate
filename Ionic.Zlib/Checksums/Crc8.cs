@@ -1,20 +1,20 @@
-namespace Ionic.Zlib
+namespace Ionic.Zlib.Checksums
 {
-    public class Crc16
+    public class Crc8
     {
-        public static Crc16 Default { get; } = new Crc16(0x1021);
+        public static Crc8 Default { get; } = new Crc8(7);
 
-        private readonly ushort[] _lookupTable;
+        private readonly byte[] _lookupTable;
 
-        public Crc16(ushort generator)
+        public Crc8(byte generator)
         {
-            _lookupTable = new ushort[256];
+            _lookupTable = new byte[256];
             for (var value = 0; value < 256; value++)
             {
-                var crc = (ushort) (value << 8);
+                var crc = (byte) value;
                 for (byte bit = 0; bit < 8; bit++)
                 {
-                    var msbSet = (crc & 0x8000) == 0x8000;
+                    var msbSet = (crc & 0b1000_0000) == 0b1000_0000;
                     crc <<= 1;
                     if (msbSet)
                     {
@@ -25,20 +25,20 @@ namespace Ionic.Zlib
                 _lookupTable[value] = crc;
             }
         }
-        
-        public ushort Compute(byte[] block)
+
+        public byte Compute(byte[] block)
         {
             return Compute(block, 0, block.Length);
         }
 
-        public ushort Compute(byte[] block, int offset, int count)
+        public byte Compute(byte[] block, int offset, int count)
         {
-            ushort crc = 0;
+            byte crc = 0;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = offset; index < offset + count; index++)
             {
-                var data = block[index] ^ (crc >> 8);
-                crc = unchecked((ushort) ((crc << 8) ^ _lookupTable[data]));
+                var data = block[index] ^ crc;
+                crc = _lookupTable[data];
             }
 
             return crc;
