@@ -1,9 +1,9 @@
+using System;
+
 namespace Ionic.Zlib.Checksums
 {
     public class Crc16
     {
-        public static Crc16 Default { get; } = new Crc16(0x1021);
-
         private readonly ushort[] _lookupTable;
 
         public Crc16(ushort generator)
@@ -26,22 +26,22 @@ namespace Ionic.Zlib.Checksums
             }
         }
         
-        public ushort Compute(byte[] block)
+        public byte[] Compute(byte[] block)
         {
             return Compute(block, 0, block.Length);
         }
 
-        public ushort Compute(byte[] block, int offset, int count)
+        public byte[] Compute(byte[] block, int offset, int count)
         {
             ushort crc = 0;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = offset; index < offset + count; index++)
             {
                 var data = block[index] ^ (crc >> 8);
-                crc = unchecked((ushort) ((crc << 8) ^ _lookupTable[data]));
+                crc = (ushort) (((crc & 0xFF) << 8) ^ _lookupTable[data]);
             }
 
-            return crc;
+            return BitConverter.GetBytes(crc);
         }
     }
 }

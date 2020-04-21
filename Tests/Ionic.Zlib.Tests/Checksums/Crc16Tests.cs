@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace Ionic.Zlib.Checksums
@@ -16,7 +17,7 @@ namespace Ionic.Zlib.Checksums
         {
             var crc16 = new Crc16(generator);
             var actual = crc16.Compute(input);
-            Assert.Equal(expected, actual);
+            Assert.Equal<byte>(BitConverter.GetBytes(expected), actual);
         }
     }
 }
