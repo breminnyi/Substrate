@@ -14,7 +14,6 @@ namespace Ionic.Zlib.Utilities
         public void ReverseReturnsCorrectValueForInputByte(byte input, byte expected)
         {
             var actual = BitHelper.Reverse(input);
-
             Assert.Equal(expected, actual);
         }
     }
