@@ -2,10 +2,12 @@ namespace Ionic.Zlib.Checksums
 {
     public class Crc8
     {
+        private readonly byte _initial;
         private readonly byte[] _lookupTable;
 
-        public Crc8(byte generator)
+        public Crc8(byte generator, byte initial)
         {
+            _initial = initial;
             _lookupTable = new byte[256];
             for (var value = 0; value < 256; value++)
             {
@@ -31,7 +33,7 @@ namespace Ionic.Zlib.Checksums
 
         public byte[] Compute(byte[] block, int offset, int count)
         {
-            byte crc = 0;
+            var crc = _initial;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = offset; index < offset + count; index++)
             {
