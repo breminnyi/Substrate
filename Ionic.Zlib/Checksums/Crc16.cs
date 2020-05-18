@@ -1,23 +1,20 @@
 using System;
-using System.Linq;
 
-namespace Ionic.Zlib
+namespace Ionic.Zlib.Checksums
 {
-    public class Crc8
+    public class Crc16
     {
-        public static Crc8 Default { get; } = new Crc8(7);
+        private readonly ushort[] _lookupTable;
 
-        private readonly byte[] _lookupTable;
-
-        public Crc8(byte generator)
+        public Crc16(ushort generator)
         {
-            _lookupTable = new byte[256];
+            _lookupTable = new ushort[256];
             for (var value = 0; value < 256; value++)
             {
-                var crc = (byte) value;
+                var crc = (ushort) (value << 8);
                 for (byte bit = 0; bit < 8; bit++)
                 {
-                    var msbSet = (crc & 0b1000_0000) == 0b1000_0000;
+                    var msbSet = (crc & 0x8000) == 0x8000;
                     crc <<= 1;
                     if (msbSet)
                     {
@@ -28,7 +25,7 @@ namespace Ionic.Zlib
                 _lookupTable[value] = crc;
             }
         }
-
+        
         public byte[] Compute(byte[] block)
         {
             return Compute(block, 0, block.Length);
@@ -36,15 +33,15 @@ namespace Ionic.Zlib
 
         public byte[] Compute(byte[] block, int offset, int count)
         {
-            byte crc = 0;
+            ushort crc = 0;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = offset; index < offset + count; index++)
             {
-                var data = block[index] ^ crc;
-                crc = _lookupTable[data];
+                var data = block[index] ^ (crc >> 8);
+                crc = (ushort) (((crc & 0xFF) << 8) ^ _lookupTable[data]);
             }
 
-            return new[] {crc};
+            return BitConverter.GetBytes(crc);
         }
     }
 }

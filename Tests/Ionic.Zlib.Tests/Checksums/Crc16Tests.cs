@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace Ionic.Zlib
+namespace Ionic.Zlib.Checksums
 {
     public class Crc16Tests
     {

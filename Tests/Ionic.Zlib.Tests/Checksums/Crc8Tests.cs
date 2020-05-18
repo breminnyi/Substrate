@@ -1,7 +1,6 @@
-using System.Diagnostics;
 using Xunit;
 
-namespace Ionic.Zlib
+namespace Ionic.Zlib.Checksums
 {
     public class Crc8Tests
     {
