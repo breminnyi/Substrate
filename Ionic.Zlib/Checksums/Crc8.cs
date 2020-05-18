@@ -1,11 +1,22 @@
+using Ionic.Zlib.Utils;
+
 namespace Ionic.Zlib.Checksums
 {
     public class Crc8
     {
         private readonly byte[] _lookupTable;
+        private readonly byte _initial;
+        private readonly bool _reflectInput;
+        private readonly bool _reflectOutput;
+        private readonly byte _finalXor;
 
-        public Crc8(byte generator)
+        public Crc8(byte polynomial, byte initial, bool reflectInput, bool reflectOutput, byte finalXor)
         {
+            _initial = initial;
+            _reflectInput = reflectInput;
+            _reflectOutput = reflectOutput;
+            _finalXor = finalXor;
+
             _lookupTable = new byte[256];
             for (var value = 0; value < 256; value++)
             {
@@ -16,7 +27,7 @@ namespace Ionic.Zlib.Checksums
                     crc <<= 1;
                     if (msbSet)
                     {
-                        crc ^= generator;
+                        crc ^= polynomial;
                     }
                 }
 
@@ -31,15 +42,16 @@ namespace Ionic.Zlib.Checksums
 
         public byte[] Compute(byte[] block, int offset, int count)
         {
-            byte crc = 0;
+            var crc = _initial;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = offset; index < offset + count; index++)
             {
-                var data = block[index] ^ crc;
+                var data = crc ^ (_reflectInput ? BitHelper.ReverseOrder(block[index]) : block[index]);
                 crc = _lookupTable[data];
             }
 
-            return new[] {crc};
+            crc = _reflectOutput ? BitHelper.ReverseOrder(crc) : crc;
+            return new[] {(byte) (crc ^ _finalXor)};
         }
     }
 }
