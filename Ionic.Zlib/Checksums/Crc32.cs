@@ -47,10 +47,11 @@ namespace Ionic.Zlib.Checksums
     /// </summary>
     internal class Crc32 : ICrcCalculator
     {
-        // private member vars
-        private static readonly uint[] LookupTable;
         private const int BufferSize = 8192;
         private const uint Initial = 0xFFFFFFFF;
+        private const uint Polynomial = 0xEDB88320;
+
+        private static readonly uint[] LookupTable;
         private uint _result = Initial;
 
         static Crc32()
@@ -117,7 +118,7 @@ namespace Ionic.Zlib.Checksums
         }
 
         /// <summary>
-        /// Get the CRC32 for the given (word,byte) combo.  This is a computation
+        /// Get the CRC32 for the given (word, byte) combo. This is a computation
         /// defined by PKzip.
         /// </summary>
         /// <param name="initial">The word to start with.</param>
@@ -154,28 +155,6 @@ namespace Ionic.Zlib.Checksums
             TotalBytesRead += count;
         }
 
-        private uint gf2_matrix_times(uint[] matrix, uint vec)
-        {
-            uint sum = 0;
-            var i = 0;
-            while (vec != 0)
-            {
-                if ((vec & 0x01) == 0x01)
-                    sum ^= matrix[i];
-                vec >>= 1;
-                i++;
-            }
-
-            return sum;
-        }
-
-        private void gf2_matrix_square(uint[] square, uint[] mat)
-        {
-            for (var i = 0; i < 32; i++)
-                square[i] = gf2_matrix_times(mat, mat[i]);
-        }
-
-
         /// <summary>
         /// Combines the given CRC32 value with the current running total.
         /// </summary>
@@ -188,17 +167,14 @@ namespace Ionic.Zlib.Checksums
         /// <param name="length">the length of data the CRC value was calculated on</param>
         public void Combine(int crc, int length)
         {
-            var even = new uint[32]; // even-power-of-two zeros operator
-            var odd = new uint[32]; // odd-power-of-two zeros operator
-
             if (length == 0)
                 return;
 
-            var crc1 = ~_result;
-            var crc2 = unchecked((uint) crc);
+            var even = new uint[32]; // even-power-of-two zeros operator
+            var odd = new uint[32]; // odd-power-of-two zeros operator
 
             // put operator for one zero bit in odd
-            odd[0] = 0xEDB88320; // the CRC-32 polynomial
+            odd[0] = Polynomial; // the CRC-32 polynomial
             uint row = 1;
             for (var i = 1; i < 32; i++)
             {
@@ -207,37 +183,36 @@ namespace Ionic.Zlib.Checksums
             }
 
             // put operator for two zero bits in even
-            gf2_matrix_square(even, odd);
+            Gf2MatrixSquare(even, odd);
 
             // put operator for four zero bits in odd
-            gf2_matrix_square(odd, even);
+            Gf2MatrixSquare(odd, even);
 
             var len2 = (uint) length;
 
+            var crc1 = ~_result;
             // apply len2 zeros to crc1 (first square will put the operator for one
             // zero byte, eight zero bits, in even)
             do
             {
                 // apply zeros operator for this bit of len2
-                gf2_matrix_square(even, odd);
+                Gf2MatrixSquare(even, odd);
 
                 if ((len2 & 1) == 1)
-                    crc1 = gf2_matrix_times(even, crc1);
+                    crc1 = Gf2MatrixTimes(even, crc1);
                 len2 >>= 1;
 
                 if (len2 == 0)
                     break;
 
                 // another iteration of the loop with odd and even swapped
-                gf2_matrix_square(odd, even);
+                Gf2MatrixSquare(odd, even);
                 if ((len2 & 1) == 1)
-                    crc1 = gf2_matrix_times(odd, crc1);
+                    crc1 = Gf2MatrixTimes(odd, crc1);
                 len2 >>= 1;
             } while (len2 != 0);
 
-            crc1 ^= crc2;
-
-            _result = ~crc1;
+            _result = ~(crc1 ^ unchecked((uint) crc));
             TotalBytesRead += length;
         }
 
@@ -253,7 +228,6 @@ namespace Ionic.Zlib.Checksums
             // bzip2, gzip, and others.
             // Often the polynomial is shown reversed as 0x04C11DB7.
             // For more details, see http://en.wikipedia.org/wiki/Cyclic_redundancy_check
-            const uint polynomial = 0xEDB88320;
             var lookup = new uint[256];
             for (uint index = 0; index < 256; index++)
             {
@@ -264,7 +238,7 @@ namespace Ionic.Zlib.Checksums
                     crc >>= 1;
                     if (msbSet)
                     {
-                        crc ^= polynomial;
+                        crc ^= Polynomial;
                     }
                 }
 
@@ -272,6 +246,32 @@ namespace Ionic.Zlib.Checksums
             }
 
             return lookup;
+        }
+
+        private uint Gf2MatrixTimes(uint[] matrix, uint vec)
+        {
+            uint sum = 0;
+            var i = 0;
+            while (vec != 0)
+            {
+                if ((vec & 0x01) == 0x01)
+                {
+                    sum ^= matrix[i];
+                }
+
+                vec >>= 1;
+                i++;
+            }
+
+            return sum;
+        }
+
+        private void Gf2MatrixSquare(uint[] square, uint[] mat)
+        {
+            for (var i = 0; i < 32; i++)
+            {
+                square[i] = Gf2MatrixTimes(mat, mat[i]);
+            }
         }
 
         byte[] ICrcCalculator.Result => BitConverter.GetBytes(Crc32Result);
