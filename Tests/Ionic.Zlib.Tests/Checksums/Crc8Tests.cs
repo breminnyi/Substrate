@@ -11,7 +11,7 @@ namespace Ionic.Zlib.Checksums
         [InlineData(new byte[] {0x01, 0x23, 0x45, 0x67, 0x89}, 0xD5, 0x4C)]
         public void ComputeShouldReturnCorrectResult(byte[] input, byte generator, byte expected)
         {
-            var crc8 = new Crc8(generator, 0x00, false, false, 0x00);
+            var crc8 = new Crc8Calculator(generator, 0x00, false, false, 0x00);
             var actual = crc8.Compute(input);
             Assert.Equal<byte>(new[] {expected}, actual);
         }
@@ -30,7 +30,7 @@ namespace Ionic.Zlib.Checksums
         public void ComputeShouldPassCheckForKnownAlgorithms(byte check, byte poly, byte init, bool refIn, bool refOut,
             byte xorOut)
         {
-            var crc8 = new Crc8(poly, init, refIn, refOut, xorOut);
+            var crc8 = new Crc8Calculator(poly, init, refIn, refOut, xorOut);
             var actual = crc8.Compute(Encoding.ASCII.GetBytes("123456789"));
             Assert.Equal<byte>(new[] {check}, actual);
         }

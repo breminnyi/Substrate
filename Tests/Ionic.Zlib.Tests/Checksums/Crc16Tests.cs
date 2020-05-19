@@ -15,7 +15,7 @@ namespace Ionic.Zlib.Checksums
             }, 0x8005, 0xCB3E)]
         public void ComputeShouldReturnValidCode(byte[] input, ushort generator, ushort expected)
         {
-            var crc16 = new Crc16(generator);
+            var crc16 = new Crc16Calculator(generator);
             var actual = crc16.Compute(input);
             Assert.Equal<byte>(BitConverter.GetBytes(expected), actual);
         }
