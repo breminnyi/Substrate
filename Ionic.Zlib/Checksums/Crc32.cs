@@ -222,7 +222,7 @@ namespace Ionic.Zlib.Checksums
                 return;
 
             var crc1= ~_RunningCrc32Result;
-            var crc2= (uint) crc;
+            var crc2 = unchecked((uint) crc);
 
             // put operator for one zero bit in odd
             odd[0] = 0xEDB88320;  // the CRC-32 polynomial
@@ -266,9 +266,14 @@ namespace Ionic.Zlib.Checksums
             crc1 ^= crc2;
 
             _RunningCrc32Result= ~crc1;
-
+            TotalBytesRead += length;
             //return (int) crc1;
             return;
+        }
+
+        public void Combine(Crc32 other)
+        {
+            Combine(other.Crc32Result, (int) other.TotalBytesRead);
         }
 
 
