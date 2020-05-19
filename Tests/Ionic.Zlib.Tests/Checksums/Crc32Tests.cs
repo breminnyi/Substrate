@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Xunit;
 
-namespace Ionic.Zlib
+namespace Ionic.Zlib.Checksums
 {
     public class Crc32Tests
     {

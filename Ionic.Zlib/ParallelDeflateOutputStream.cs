@@ -20,6 +20,7 @@ using System;
 using System.Threading;
 using Ionic.Zlib;
 using System.IO;
+using Ionic.Zlib.Checksums;
 
 
 namespace Ionic.Zlib

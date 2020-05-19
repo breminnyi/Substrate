@@ -34,10 +34,9 @@
 
 
 using System.IO;
-using Interop=System.Runtime.InteropServices;
 
 
-namespace Ionic.Zlib
+namespace Ionic.Zlib.Checksums
 {
     /// <summary>
     /// Calculates a 32bit Cyclic Redundancy Checksum (CRC) using the same polynomial

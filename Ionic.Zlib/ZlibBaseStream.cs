@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using Ionic.Zlib.Checksums;
 
 namespace Ionic.Zlib
 {

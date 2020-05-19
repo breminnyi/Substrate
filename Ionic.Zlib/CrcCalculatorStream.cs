@@ -1,4 +1,5 @@
 using System;
+using Ionic.Zlib.Checksums;
 
 namespace Ionic.Zlib
 {
