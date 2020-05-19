@@ -33,20 +33,32 @@
 // ------------------------------------------------------------------
 
 
+using System;
 using System.IO;
 
 
 namespace Ionic.Zlib.Checksums
 {
     /// <summary>
-    /// Calculates a 32bit Cyclic Redundancy Checksum (CRC) using the same polynomial
+    /// Calculates a 32-bit Cyclic Redundancy Checksum (CRC) using the same polynomial
     /// used by Zip. This type is used internally by DotNetZip; it is generally not used
     /// directly by applications wishing to create, read, or manipulate zip archive
     /// files.
     /// </summary>
-
-    internal class Crc32
+    internal class Crc32 : ICrcCalculator
     {
+        // private member vars
+        private static readonly uint[] LookupTable;
+        private const int BufferSize = 8192;
+        private const uint Initial = 0xFFFFFFFF;
+        private uint _result = Initial;
+        
+        static Crc32()
+        {
+            // pre-initialize the CRC table for speed of lookup.
+            LookupTable = GenerateLookup();
+        }
+
         /// <summary>
         /// indicates the total number of bytes read on the CRC stream.
         /// This is used when writing the ZipDirEntry when compressing files.
@@ -57,7 +69,7 @@ namespace Ionic.Zlib.Checksums
         /// Indicates the current CRC for all blocks slurped in.
         /// </summary>
         // return one's complement of the running result
-        public int Crc32Result => unchecked((int)(~_RunningCrc32Result));
+        public int Crc32Result => unchecked((int)(~_result));
 
         /// <summary>
         /// Returns the CRC32 for the specified stream.
@@ -85,8 +97,8 @@ namespace Ionic.Zlib.Checksums
             {
                 //UInt32 crc32Result;
                 //crc32Result = 0xFFFFFFFF;
-                var buffer = new byte[BUFFER_SIZE];
-                var readSize = BUFFER_SIZE;
+                var buffer = new byte[BufferSize];
+                var readSize = BufferSize;
 
                 TotalBytesRead = 0;
                 var count = input.Read(buffer, 0, readSize);
@@ -100,26 +112,25 @@ namespace Ionic.Zlib.Checksums
                     TotalBytesRead += count;
                 }
 
-                return (int)(~_RunningCrc32Result);
+                return (int)(~_result);
             }
         }
-
 
         /// <summary>
         /// Get the CRC32 for the given (word,byte) combo.  This is a computation
         /// defined by PKzip.
         /// </summary>
-        /// <param name="W">The word to start with.</param>
-        /// <param name="B">The byte to combine it with.</param>
+        /// <param name="initial">The word to start with.</param>
+        /// <param name="value">The byte to combine it with.</param>
         /// <returns>The CRC-ized result.</returns>
-        public int ComputeCrc32(int W, byte B)
+        public int Compute(int initial, byte value)
         {
-            return _InternalComputeCrc32((uint)W, B);
+            return ComputeInternal((uint)initial, value);
         }
 
-        internal int _InternalComputeCrc32(uint W, byte B)
+        internal int ComputeInternal(uint initial, byte value)
         {
-            return (int)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
+            return (int)(LookupTable[(initial ^ value) & 0xFF] ^ (initial >> 8));
         }
 
         /// <summary>
@@ -137,49 +148,10 @@ namespace Ionic.Zlib.Checksums
             for (var i = 0; i < count; i++)
             {
                 var x = offset + i;
-                _RunningCrc32Result = ((_RunningCrc32Result) >> 8) ^ crc32Table[(block[x]) ^ ((_RunningCrc32Result) & 0x000000FF)];
+                _result = ((_result) >> 8) ^ LookupTable[(block[x]) ^ ((_result) & 0x000000FF)];
             }
             TotalBytesRead += count;
         }
-
-
-        // pre-initialize the crc table for speed of lookup.
-        static Crc32()
-        {
-            unchecked
-            {
-                // PKZip specifies CRC32 with a polynomial of 0xEDB88320;
-                // This is also the CRC-32 polynomial used bby Ethernet, FDDI,
-                // bzip2, gzip, and others.
-                // Often the polynomial is shown reversed as 0x04C11DB7.
-                // For more details, see http://en.wikipedia.org/wiki/Cyclic_redundancy_check
-                var dwPolynomial = 0xEDB88320;
-                uint i, j;
-
-                crc32Table = new uint[256];
-
-                uint dwCrc;
-                for (i = 0; i < 256; i++)
-                {
-                    dwCrc = i;
-                    for (j = 8; j > 0; j--)
-                    {
-                        if ((dwCrc & 1) == 1)
-                        {
-                            dwCrc = (dwCrc >> 1) ^ dwPolynomial;
-                        }
-                        else
-                        {
-                            dwCrc >>= 1;
-                        }
-                    }
-                    crc32Table[i] = dwCrc;
-                }
-            }
-        }
-
-
-
 
         private uint gf2_matrix_times(uint[] matrix, uint vec)
         {
@@ -221,7 +193,7 @@ namespace Ionic.Zlib.Checksums
             if (length == 0)
                 return;
 
-            var crc1= ~_RunningCrc32Result;
+            var crc1= ~_result;
             var crc2 = unchecked((uint) crc);
 
             // put operator for one zero bit in odd
@@ -265,23 +237,59 @@ namespace Ionic.Zlib.Checksums
 
             crc1 ^= crc2;
 
-            _RunningCrc32Result= ~crc1;
+            _result= ~crc1;
             TotalBytesRead += length;
-            //return (int) crc1;
-            return;
         }
 
         public void Combine(Crc32 other)
         {
             Combine(other.Crc32Result, (int) other.TotalBytesRead);
         }
+        
+        private static uint[] GenerateLookup()
+        {
+            // PKZip specifies CRC32 with a polynomial of 0xEDB88320;
+            // This is also the CRC-32 polynomial used bby Ethernet, FDDI,
+            // bzip2, gzip, and others.
+            // Often the polynomial is shown reversed as 0x04C11DB7.
+            // For more details, see http://en.wikipedia.org/wiki/Cyclic_redundancy_check
+            const uint polynomial = 0xEDB88320;
+            var lookup = new uint[256];
+            unchecked
+            {
+                for (uint index = 0; index < 256; index++)
+                {
+                    var crc = index;
+                    for (var bit = 0; bit < 8; bit++)
+                    {
+                        var msbSet = (crc & 1) == 1;
+                        crc >>= 1;
+                        if (msbSet)
+                        {
+                            crc ^= polynomial;
+                        }
+                    }
 
+                    lookup[index] = crc;
+                }
+            }
 
+            return lookup;
+        }
 
-        // private member vars
-        private static readonly uint[] crc32Table;
-        private const int BUFFER_SIZE = 8192;
-        private uint _RunningCrc32Result = 0xFFFFFFFF;
+        byte[] ICrcCalculator.Result => BitConverter.GetBytes(Crc32Result);
 
+        long ICrcCalculator.BytesRead => TotalBytesRead;
+
+        void ICrcCalculator.Advance(byte[] block, int offset, int count)
+        {
+            SlurpBlock(block, offset, count);
+        }
+
+        void ICrcCalculator.Reset()
+        {
+            _result = Initial;
+            TotalBytesRead = 0;
+        }
     }
 }
