@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>
+    <RootNamespace>Substrate</RootNamespace>
+    <TargetFramework>net48</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+</PropertyGroup>
+
+<ItemGroup>
+    <ProjectReference Include="..\Ionic.Zlib\Ionic.Zlib.csproj" />
+</ItemGroup>
+
+</Project>

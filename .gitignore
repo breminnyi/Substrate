@@ -1,7 +1,10 @@
+**/.idea
 **/Debug/*
 **/bin/*
 **/obj/*
 *.suo
-SubstrateCS/Release/
+**/Release/*
+
+**/packages/*
 *.sdf
 *.user

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>
+    <RootNamespace>Ionic.Zlib</RootNamespace>
+    <TargetFramework>net48</TargetFramework>
+</PropertyGroup>
+
+<ItemGroup>
+    <PackageReference Include="xunit" Version="2.4.1" />
+</ItemGroup>
+
+<ItemGroup>
+  <ProjectReference Include="..\..\Sources\Ionic.Zlib\Ionic.Zlib.csproj" />
+</ItemGroup>
+
+</Project>
