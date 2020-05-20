@@ -45,7 +45,7 @@ namespace Ionic.Zlib.Checksums
     /// directly by applications wishing to create, read, or manipulate zip archive
     /// files.
     /// </summary>
-    internal class Crc32 : ICrcCalculator
+    internal class Crc32
     {
         private const int BufferSize = 8192;
         private const uint Initial = 0xFFFFFFFF;
@@ -272,21 +272,6 @@ namespace Ionic.Zlib.Checksums
             {
                 square[i] = Gf2MatrixTimes(mat, mat[i]);
             }
-        }
-
-        byte[] ICrcCalculator.Result => BitConverter.GetBytes(Crc32Result);
-
-        long ICrcCalculator.BytesRead => TotalBytesRead;
-
-        void ICrcCalculator.Advance(byte[] block, int offset, int count)
-        {
-            SlurpBlock(block, offset, count);
-        }
-
-        void ICrcCalculator.Reset()
-        {
-            _result = Initial;
-            TotalBytesRead = 0;
         }
     }
 }

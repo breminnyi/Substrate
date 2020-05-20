@@ -76,17 +76,5 @@ namespace Ionic.Zlib.Checksums
 
             return chunkedCrc;
         }
-
-        [Fact]
-        public void ShouldPassCheckIfUsedAsInterface()
-        {
-            var input = Encoding.ASCII.GetBytes("123456789");
-            ICrcCalculator crc = new Crc32();
-            var expected = BitConverter.GetBytes(0xCBF43926);
-            
-            var actual = crc.Compute(input);
-
-            Assert.Equal<byte>(expected, actual);
-        }
     }
 }
