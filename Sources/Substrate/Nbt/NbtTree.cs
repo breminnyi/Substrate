@@ -103,7 +103,7 @@ namespace Substrate.Nbt
 
                 if (_root != null)
                 {
-                    WriteTag(_rootName, _root);
+                    WriteTag(_rootName, _root, _stream);
                 }
 
                 _stream = null;
@@ -473,7 +473,7 @@ namespace Substrate.Nbt
             return false;
         }
 
-        private void WriteValue(TagNode val)
+        private static void WriteValue(TagNode val, Stream stream)
         {
             switch (val.GetTagType())
             {
@@ -481,77 +481,65 @@ namespace Substrate.Nbt
                     break;
 
                 case TagType.TAG_BYTE:
-                    WriteByte(val.ToTagByte());
+                    WriteByte(val.ToTagByte(), stream);
                     break;
 
                 case TagType.TAG_SHORT:
-                    WriteShort(val.ToTagShort());
+                    WriteShort(val.ToTagShort(), stream);
                     break;
 
                 case TagType.TAG_INT:
-                    WriteInt(val.ToTagInt());
+                    WriteInt(val.ToTagInt(), stream);
                     break;
 
                 case TagType.TAG_LONG:
-                    WriteLong(val.ToTagLong());
+                    WriteLong(val.ToTagLong(), stream);
                     break;
 
                 case TagType.TAG_FLOAT:
-                    WriteFloat(val.ToTagFloat());
+                    WriteFloat(val.ToTagFloat(), stream);
                     break;
 
                 case TagType.TAG_DOUBLE:
-                    WriteDouble(val.ToTagDouble());
+                    WriteDouble(val.ToTagDouble(), stream);
                     break;
 
                 case TagType.TAG_BYTE_ARRAY:
-                    WriteByteArray(val.ToTagByteArray());
+                    WriteByteArray(val.ToTagByteArray(), stream);
                     break;
 
                 case TagType.TAG_STRING:
-                    WriteString(val.ToTagString());
+                    WriteString(val.ToTagString(), stream);
                     break;
 
                 case TagType.TAG_LIST:
-                    WriteList(val.ToTagList());
+                    WriteList(val.ToTagList(), stream);
                     break;
 
                 case TagType.TAG_COMPOUND:
-                    WriteCompound(val.ToTagCompound());
+                    WriteCompound(val.ToTagCompound(), stream);
                     break;
 
                 case TagType.TAG_INT_ARRAY:
-                    WriteIntArray(val.ToTagIntArray());
+                    WriteIntArray(val.ToTagIntArray(), stream);
                     break;
 
                 case TagType.TAG_LONG_ARRAY:
-                    WriteLongArray(val.ToTagLongArray());
+                    WriteLongArray(val.ToTagLongArray(), stream);
                     break;
 
                 case TagType.TAG_SHORT_ARRAY:
-                    WriteShortArray(val.ToTagShortArray());
+                    WriteShortArray(val.ToTagShortArray(), stream);
                     break;
             }
         }
 
-        private void WriteByte(TagNodeByte val)
+        private static void WriteByte(TagNodeByte val, Stream stream)
         {
-            _stream.WriteByte(val.Data);
+            stream.WriteByte(val.Data);
         }
 
-        private void WriteShort(TagNodeShort val)
-        {
-            byte[] gzBytes = BitConverter.GetBytes(val.Data);
-
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(gzBytes);
-            }
-
-            _stream.Write(gzBytes, 0, 2);
-        }
-
-        private void WriteInt(TagNodeInt val)
+        private static void WriteShort(TagNodeShort val, Stream stream)
         {
             byte[] gzBytes = BitConverter.GetBytes(val.Data);
 
@@ -560,10 +548,10 @@ namespace Substrate.Nbt
                 Array.Reverse(gzBytes);
             }
 
-            _stream.Write(gzBytes, 0, 4);
+            stream.Write(gzBytes, 0, 2);
         }
 
-        private void WriteLong(TagNodeLong val)
+        private static void WriteInt(TagNodeInt val, Stream stream)
         {
             byte[] gzBytes = BitConverter.GetBytes(val.Data);
 
@@ -572,10 +560,10 @@ namespace Substrate.Nbt
                 Array.Reverse(gzBytes);
             }
 
-            _stream.Write(gzBytes, 0, 8);
+            stream.Write(gzBytes, 0, 4);
         }
 
-        private void WriteFloat(TagNodeFloat val)
+        private static void WriteLong(TagNodeLong val, Stream stream)
         {
             byte[] gzBytes = BitConverter.GetBytes(val.Data);
 
@@ -584,10 +572,10 @@ namespace Substrate.Nbt
                 Array.Reverse(gzBytes);
             }
 
-            _stream.Write(gzBytes, 0, 4);
+            stream.Write(gzBytes, 0, 8);
         }
 
-        private void WriteDouble(TagNodeDouble val)
+        private static void WriteFloat(TagNodeFloat val, Stream stream)
         {
             byte[] gzBytes = BitConverter.GetBytes(val.Data);
 
@@ -596,10 +584,22 @@ namespace Substrate.Nbt
                 Array.Reverse(gzBytes);
             }
 
-            _stream.Write(gzBytes, 0, 8);
+            stream.Write(gzBytes, 0, 4);
         }
 
-        private void WriteByteArray(TagNodeByteArray val)
+        private static void WriteDouble(TagNodeDouble val, Stream stream)
+        {
+            byte[] gzBytes = BitConverter.GetBytes(val.Data);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(gzBytes);
+            }
+
+            stream.Write(gzBytes, 0, 8);
+        }
+
+        private static void WriteByteArray(TagNodeByteArray val, Stream stream)
         {
             byte[] lenBytes = BitConverter.GetBytes(val.Length);
 
@@ -608,15 +608,13 @@ namespace Substrate.Nbt
                 Array.Reverse(lenBytes);
             }
 
-            _stream.Write(lenBytes, 0, 4);
-            _stream.Write(val.Data, 0, val.Length);
+            stream.Write(lenBytes, 0, 4);
+            stream.Write(val.Data, 0, val.Length);
         }
 
-        private void WriteString(TagNodeString val)
+        private static void WriteString(TagNodeString val, Stream stream)
         {
-            System.Text.Encoding str = Encoding.UTF8;
-            byte[] gzBytes = str.GetBytes(val.Data);
-
+            byte[] gzBytes = Encoding.UTF8.GetBytes(val.Data);
             byte[] lenBytes = BitConverter.GetBytes((short) gzBytes.Length);
 
             if (BitConverter.IsLittleEndian)
@@ -624,12 +622,11 @@ namespace Substrate.Nbt
                 Array.Reverse(lenBytes);
             }
 
-            _stream.Write(lenBytes, 0, 2);
-
-            _stream.Write(gzBytes, 0, gzBytes.Length);
+            stream.Write(lenBytes, 0, 2);
+            stream.Write(gzBytes, 0, gzBytes.Length);
         }
 
-        private void WriteList(TagNodeList val)
+        private static void WriteList(TagNodeList val, Stream stream)
         {
             byte[] lenBytes = BitConverter.GetBytes(val.Count);
 
@@ -638,26 +635,26 @@ namespace Substrate.Nbt
                 Array.Reverse(lenBytes);
             }
 
-            _stream.WriteByte((byte) val.ValueType);
-            _stream.Write(lenBytes, 0, 4);
+            stream.WriteByte((byte) val.ValueType);
+            stream.Write(lenBytes, 0, 4);
 
             foreach (TagNode v in val)
             {
-                WriteValue(v);
+                WriteValue(v, stream);
             }
         }
 
-        private void WriteCompound(TagNodeCompound val)
+        private static void WriteCompound(TagNodeCompound val, Stream stream)
         {
             foreach (KeyValuePair<string, TagNode> item in val)
             {
-                WriteTag(item.Key, item.Value);
+                WriteTag(item.Key, item.Value, stream);
             }
 
-            WriteTag(null, _nulltag);
+            WriteTag(null, _nulltag, stream);
         }
 
-        private void WriteIntArray(TagNodeIntArray val)
+        private static void WriteIntArray(TagNodeIntArray val, Stream stream)
         {
             byte[] lenBytes = BitConverter.GetBytes(val.Length);
 
@@ -666,7 +663,7 @@ namespace Substrate.Nbt
                 Array.Reverse(lenBytes);
             }
 
-            _stream.Write(lenBytes, 0, 4);
+            stream.Write(lenBytes, 0, 4);
 
             byte[] data = new byte[val.Length * 4];
             for (int i = 0; i < val.Length; i++)
@@ -680,10 +677,10 @@ namespace Substrate.Nbt
                 Array.Copy(buffer, 0, data, i * 4, 4);
             }
 
-            _stream.Write(data, 0, data.Length);
+            stream.Write(data, 0, data.Length);
         }
 
-        private void WriteLongArray(TagNodeLongArray val)
+        private static void WriteLongArray(TagNodeLongArray val, Stream stream)
         {
             byte[] lenBytes = BitConverter.GetBytes(val.Length);
 
@@ -692,7 +689,7 @@ namespace Substrate.Nbt
                 Array.Reverse(lenBytes);
             }
 
-            _stream.Write(lenBytes, 0, 4);
+            stream.Write(lenBytes, 0, 4);
 
             byte[] data = new byte[val.Length * 8];
             for (int i = 0; i < val.Length; i++)
@@ -706,10 +703,10 @@ namespace Substrate.Nbt
                 Array.Copy(buffer, 0, data, i * 8, 8);
             }
 
-            _stream.Write(data, 0, data.Length);
+            stream.Write(data, 0, data.Length);
         }
 
-        private void WriteShortArray(TagNodeShortArray val)
+        private static void WriteShortArray(TagNodeShortArray val, Stream stream)
         {
             byte[] lenBytes = BitConverter.GetBytes(val.Length);
 
@@ -718,7 +715,7 @@ namespace Substrate.Nbt
                 Array.Reverse(lenBytes);
             }
 
-            _stream.Write(lenBytes, 0, 4);
+            stream.Write(lenBytes, 0, 4);
 
             byte[] data = new byte[val.Length * 2];
             for (int i = 0; i < val.Length; i++)
@@ -732,17 +729,17 @@ namespace Substrate.Nbt
                 Array.Copy(buffer, 0, data, i * 2, 2);
             }
 
-            _stream.Write(data, 0, data.Length);
+            stream.Write(data, 0, data.Length);
         }
 
-        private void WriteTag(string name, TagNode val)
+        private static void WriteTag(string name, TagNode val, Stream stream)
         {
-            _stream.WriteByte((byte) val.GetTagType());
+            stream.WriteByte((byte) val.GetTagType());
 
             if (val.GetTagType() != TagType.TAG_END)
             {
-                WriteString(name);
-                WriteValue(val);
+                WriteString(name, stream);
+                WriteValue(val, stream);
             }
         }
 
