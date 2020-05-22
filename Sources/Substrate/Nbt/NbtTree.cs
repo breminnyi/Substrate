@@ -308,8 +308,8 @@ namespace Substrate.Nbt
                 throw new NBTException(NBTException.MSG_READ_NEG);
             }
 
-            if (val.ValueType == TagType.TAG_END)
-                return new TagNodeList(TagType.TAG_BYTE);
+            // if (val.ValueType == TagType.TAG_END)
+            //     return new TagNodeList(TagType.TAG_BYTE);
 
             for (int i = 0; i < length; i++) {
                 val.Add(ReadValue(val.ValueType));
