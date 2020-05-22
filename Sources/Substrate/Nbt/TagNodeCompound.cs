@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Substrate.Nbt
 {
@@ -80,6 +81,16 @@ namespace Substrate.Nbt
         public override string ToString ()
         {
             return _tags.ToString();
+        }
+
+        internal override void SerializeValue(Stream stream)
+        {
+            foreach (var pair in this)
+            {
+                pair.Value.Serialize(pair.Key, stream);
+            }
+
+            stream.WriteByte((byte)TagType.TAG_END);
         }
 
         #region IDictionary<string,NBT_Value> Members

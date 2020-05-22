@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Substrate.Nbt
 {
@@ -163,6 +164,23 @@ namespace Substrate.Nbt
 
             _items.Clear();
             _type = type;
+        }
+
+        internal override void SerializeValue(Stream stream)
+        {
+            var lenBytes = BitConverter.GetBytes(Count);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(lenBytes);
+            }
+
+            stream.WriteByte((byte) ValueType);
+            stream.Write(lenBytes, 0, 4);
+
+            foreach (var item in _items)
+            {
+                item.SerializeValue(stream);
+            }
         }
 
         #region IList<NBT_Value> Members

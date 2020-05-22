@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Substrate.Nbt
@@ -107,6 +108,30 @@ namespace Substrate.Nbt
         public static implicit operator long[] (TagNodeLongArray i)
         {
             return i._data;
+        }
+
+        internal override void SerializeValue(Stream stream)
+        {
+            var lenBytes = BitConverter.GetBytes(this.Length);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(lenBytes);
+            }
+
+            stream.Write(lenBytes, 0, 4);
+            var data = new byte[this.Length * 8];
+            for (var i = 0; i < this.Length; i++)
+            {
+                var buffer = BitConverter.GetBytes(this.Data[i]);
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(buffer);
+                }
+
+                Array.Copy(buffer, 0, data, i * 8, 8);
+            }
+
+            stream.Write(data, 0, data.Length);
         }
     }
 }

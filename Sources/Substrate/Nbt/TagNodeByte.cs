@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Substrate.Nbt
 {
@@ -156,6 +157,11 @@ namespace Substrate.Nbt
         public static implicit operator long (TagNodeByte b)
         {
             return b._data;
+        }
+
+        internal override void SerializeValue(Stream stream)
+        {
+            stream.WriteByte(Data);
         }
     }
 }

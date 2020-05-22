@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Substrate.Core;
 
@@ -10,15 +11,6 @@ namespace Substrate.Nbt
     /// </summary>
     public abstract class TagNode : ICopyable<TagNode>
     {
-        /// <summary>
-        /// Convert this node to a null tag type if supported.
-        /// </summary>
-        /// <returns>A new null node.</returns>
-        public virtual TagNodeNull ToTagNull () 
-        { 
-            throw new InvalidCastException();
-        }
-
         /// <summary>
         /// Convert this node to a byte tag type if supported.
         /// </summary>
@@ -163,5 +155,14 @@ namespace Substrate.Nbt
         {
             return null;
         }
+
+        public void Serialize(string name, Stream stream)
+        {
+            stream.WriteByte((byte) GetTagType());
+            new TagNodeString(name).SerializeValue(stream);
+            SerializeValue(stream);
+        }
+
+        internal abstract void SerializeValue(Stream stream);
     }
 }

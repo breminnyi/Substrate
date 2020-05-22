@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Substrate.Nbt
 {
@@ -108,6 +109,18 @@ namespace Substrate.Nbt
         public static implicit operator byte[] (TagNodeByteArray b)
         {
             return b._data;
+        }
+
+        internal override void SerializeValue(Stream stream)
+        {
+            var lenBytes = BitConverter.GetBytes(this.Length);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(lenBytes);
+            }
+
+            stream.Write(lenBytes, 0, 4);
+            stream.Write(this.Data, 0, this.Length);
         }
     }
 }
