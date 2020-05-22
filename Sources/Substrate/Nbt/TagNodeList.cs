@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Substrate.Utilities;
 
 namespace Substrate.Nbt
 {
@@ -168,12 +169,7 @@ namespace Substrate.Nbt
 
         internal override void SerializeValue(Stream stream)
         {
-            var lenBytes = BitConverter.GetBytes(Count);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(lenBytes);
-            }
-
+            var lenBytes = BitConverter.GetBytes(Count).EnsureBigEndian();
             stream.WriteByte((byte) ValueType);
             stream.Write(lenBytes, 0, 4);
 

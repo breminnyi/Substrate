@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Substrate.Utilities;
 
 namespace Substrate.Nbt
 {
@@ -121,12 +122,7 @@ namespace Substrate.Nbt
 
         internal override void SerializeValue(Stream stream)
         {
-            var gzBytes = BitConverter.GetBytes(Data);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(gzBytes);
-            }
-
+            var gzBytes = BitConverter.GetBytes(Data).EnsureBigEndian();
             stream.Write(gzBytes, 0, 8);
         }
     }

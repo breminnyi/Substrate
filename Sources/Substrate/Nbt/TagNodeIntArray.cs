@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Substrate.Utilities;
 
 namespace Substrate.Nbt
 {
@@ -112,22 +113,12 @@ namespace Substrate.Nbt
 
         internal override void SerializeValue(Stream stream)
         {
-            var lenBytes = BitConverter.GetBytes(Length);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(lenBytes);
-            }
-
+            var lenBytes = BitConverter.GetBytes(Length).EnsureBigEndian();
             stream.Write(lenBytes, 0, 4);
             var data = new byte[Length * 4];
             for (var i = 0; i < Length; i++)
             {
-                var buffer = BitConverter.GetBytes(Data[i]);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buffer);
-                }
-
+                var buffer = BitConverter.GetBytes(Data[i]).EnsureBigEndian();
                 Array.Copy(buffer, 0, data, i * 4, 4);
             }
 
