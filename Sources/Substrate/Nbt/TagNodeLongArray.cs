@@ -8,8 +8,6 @@ namespace Substrate.Nbt
 {
     public sealed class TagNodeLongArray : TagNode
     {
-        private long[] _data = null;
-
         /// <summary>
         /// Converts the node to itself.
         /// </summary>
@@ -31,18 +29,14 @@ namespace Substrate.Nbt
         /// <summary>
         /// Gets or sets an long array of tag data.
         /// </summary>
-        public long[] Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
+        public long[] Data { get; set; }
 
         /// <summary>
         /// Gets the length of the stored byte array.
         /// </summary>
         public int Length
         {
-            get { return _data.Length; }
+            get { return Data.Length; }
         }
 
         /// <summary>
@@ -56,7 +50,7 @@ namespace Substrate.Nbt
         /// <param name="d">The value to set the node's tag data value.</param>
         public TagNodeLongArray(long[] d)
         {
-            _data = d;
+            Data = d;
         }
 
         /// <summary>
@@ -65,8 +59,8 @@ namespace Substrate.Nbt
         /// <returns>A new long array node representing the same data.</returns>
         public override TagNode Copy ()
         {
-            long[] arr = new long[_data.Length];
-            _data.CopyTo(arr, 0);
+            long[] arr = new long[Data.Length];
+            Data.CopyTo(arr, 0);
 
             return new TagNodeLongArray(arr);
         }
@@ -77,7 +71,7 @@ namespace Substrate.Nbt
         /// <returns>String representation of the node's data.</returns>
         public override string ToString ()
         {
-            return _data.ToString();
+            return Data.ToString();
         }
 
         /// <summary>
@@ -87,8 +81,8 @@ namespace Substrate.Nbt
         /// <returns>The long value at the given index of the stored byte array.</returns>
         public long this[int index]
         {
-            get { return _data[index]; }
-            set { _data[index] = value; }
+            get { return Data[index]; }
+            set { Data[index] = value; }
         }
 
         /// <summary>
@@ -108,7 +102,7 @@ namespace Substrate.Nbt
         /// <returns>A system long array set to the node's data.</returns>
         public static implicit operator long[] (TagNodeLongArray i)
         {
-            return i._data;
+            return i.Data;
         }
 
         internal override void SerializeValue(Stream stream)
@@ -123,6 +117,27 @@ namespace Substrate.Nbt
             }
 
             stream.Write(data, 0, data.Length);
+        }
+
+        protected internal override void Deserialize(Stream stream)
+        {
+            var lenBytes = new byte[4];
+            stream.Read(lenBytes, 0, 4);
+            var length = BitConverter.ToInt32(lenBytes.EnsureBigEndian(), 0);
+            if (length < 0)
+            {
+                throw new NbtException(NbtException.MSG_READ_NEG);
+            }
+
+            var data = new long[length];
+            var buffer = new byte[8];
+            for (var i = 0; i < length; i++)
+            {
+                stream.Read(buffer, 0, 8);
+                data[i] = BitConverter.ToInt64(buffer.EnsureBigEndian(), 0);
+            }
+
+            Data = data;
         }
     }
 }

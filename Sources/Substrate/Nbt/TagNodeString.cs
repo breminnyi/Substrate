@@ -108,5 +108,20 @@ namespace Substrate.Nbt
             stream.Write(lenBytes, 0, 2);
             stream.Write(gzBytes, 0, gzBytes.Length);
         }
+
+        protected internal override void Deserialize(Stream stream)
+        {
+            var lenBytes = new byte[2];
+            stream.Read(lenBytes, 0, 2);
+            var len = BitConverter.ToInt16(lenBytes.EnsureBigEndian(), 0);
+            if (len < 0)
+            {
+                throw new NbtException(NbtException.MSG_READ_NEG);
+            }
+
+            var strBytes = new byte[len];
+            stream.Read(strBytes, 0, len);
+            Data = Encoding.UTF8.GetString(strBytes);
+        }
     }
 }

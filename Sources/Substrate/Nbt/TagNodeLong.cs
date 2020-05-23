@@ -125,5 +125,12 @@ namespace Substrate.Nbt
             var gzBytes = BitConverter.GetBytes(Data).EnsureBigEndian();
             stream.Write(gzBytes, 0, 8);
         }
+
+        protected internal override void Deserialize(Stream stream)
+        {
+            var gzBytes = new byte[8];
+            stream.Read(gzBytes, 0, 8);
+            Data = BitConverter.ToInt64(gzBytes.EnsureBigEndian(), 0);
+        }
     }
 }

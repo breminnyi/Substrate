@@ -52,6 +52,10 @@ namespace Substrate.Nbt
             get { return _type; }
         }
 
+        public TagNodeList() : this(TagType.TAG_END)
+        {
+        }
+
         /// <summary>
         /// Constructs a new empty list node.
         /// </summary>
@@ -60,17 +64,6 @@ namespace Substrate.Nbt
         {
             _type = type;
             _items = new List<TagNode>();
-        }
-
-        /// <summary>
-        /// Constructs a new list node from a list of nodes.
-        /// </summary>
-        /// <param name="type">The tag type of the list's subnodes.</param>
-        /// <param name="items">A list containing node objects matching the type parameter.</param>
-        public TagNodeList (TagType type, List<TagNode> items)
-        {
-            _type = type;
-            _items = items;
         }
 
         /// <summary>
@@ -176,6 +169,36 @@ namespace Substrate.Nbt
             foreach (var item in _items)
             {
                 item.SerializeValue(stream);
+            }
+        }
+
+        protected internal override void Deserialize(Stream stream)
+        {
+            var gzByte = stream.ReadByte();
+            if (gzByte == -1)
+            {
+                throw new NbtException(NbtException.MSG_GZIP_ENDOFSTREAM);
+            }
+
+            _type = (TagType) gzByte;
+            if (ValueType > (TagType) Enum.GetValues(typeof(TagType)).GetUpperBound(0))
+            {
+                throw new NbtException(NbtException.MSG_READ_TYPE);
+            }
+
+            var lenBytes = new byte[4];
+            stream.Read(lenBytes, 0, 4);
+            var length = BitConverter.ToInt32(lenBytes.EnsureBigEndian(), 0);
+            if (length < 0)
+            {
+                throw new NbtException(NbtException.MSG_READ_NEG);
+            }
+
+            for (var i = 0; i < length; i++)
+            {
+                var child = TagNodeFactory.Instance.Create(ValueType);
+                child.Deserialize(stream);
+                Add(child);
             }
         }
 

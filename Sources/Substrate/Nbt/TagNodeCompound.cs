@@ -93,6 +93,29 @@ namespace Substrate.Nbt
             stream.WriteByte((byte)TagType.TAG_END);
         }
 
+        protected internal override void Deserialize(Stream stream)
+        {
+            while (ReadTag(this, stream))
+            {
+            }
+        }
+        
+        private static bool ReadTag(TagNodeCompound parent, Stream stream)
+        {
+            var type = (TagType) stream.ReadByte();
+            if (type != TagType.TAG_END)
+            {
+                var nameTag = new TagNodeString();
+                nameTag.Deserialize(stream);
+                var tag = TagNodeFactory.Instance.Create(type);
+                tag.Deserialize(stream);
+                parent[nameTag] = tag;
+                return true;
+            }
+
+            return false;
+        }
+
         #region IDictionary<string,NBT_Value> Members
 
         /// <summary>

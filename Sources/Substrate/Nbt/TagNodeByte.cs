@@ -159,5 +159,16 @@ namespace Substrate.Nbt
         {
             stream.WriteByte(Data);
         }
+
+        protected internal override void Deserialize(Stream stream)
+        {
+            var value = stream.ReadByte();
+            if (value == -1)
+            {
+                throw new NbtException(NbtException.MSG_GZIP_ENDOFSTREAM);
+            }
+
+            Data = (byte) value;
+        }
     }
 }

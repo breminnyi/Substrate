@@ -35,3 +35,5 @@ using System.Runtime.InteropServices;
 
 // This library is compatible with all CLS-compliant .NET programming languages.
 [assembly: CLSCompliant(true)]
+
+[assembly:InternalsVisibleTo("Substrate.Tests")]

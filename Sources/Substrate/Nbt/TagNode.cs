@@ -11,6 +11,8 @@ namespace Substrate.Nbt
     /// </summary>
     public abstract class TagNode : ICopyable<TagNode>
     {
+        protected internal abstract void Deserialize(Stream stream);
+        
         /// <summary>
         /// Convert this node to a byte tag type if supported.
         /// </summary>

@@ -13,7 +13,7 @@ namespace Substrate.Tests.Nbt
         [InlineData("", 0x00)]
         [InlineData(null, 0x12)]
         [InlineData("hello world", 0x40)]
-        public void Test(string name, byte input)
+        public void SerializeWritesCorrectByteSequence(string name, byte input)
         {
             if (name == null) name = string.Empty;
             var expected = new byte[1 + 2 + name.Length + 1];

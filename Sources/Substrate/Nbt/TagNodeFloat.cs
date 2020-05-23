@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Substrate.Utilities;
 
 namespace Substrate.Nbt
 {
@@ -128,6 +129,13 @@ namespace Substrate.Nbt
             }
 
             stream.Write(gzBytes, 0, 4);
+        }
+
+        protected internal override void Deserialize(Stream stream)
+        {
+            var gzBytes = new byte[4];
+            stream.Read(gzBytes, 0, 4);
+            Data = BitConverter.ToSingle(gzBytes.EnsureBigEndian(), 0);
         }
     }
 }

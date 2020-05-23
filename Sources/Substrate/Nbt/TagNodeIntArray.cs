@@ -124,5 +124,26 @@ namespace Substrate.Nbt
 
             stream.Write(data, 0, data.Length);
         }
+
+        protected internal override void Deserialize(Stream stream)
+        {
+            var lenBytes = new byte[4];
+            stream.Read(lenBytes, 0, 4);
+            var length = BitConverter.ToInt32(lenBytes.EnsureBigEndian(), 0);
+            if (length < 0)
+            {
+                throw new NbtException(NbtException.MSG_READ_NEG);
+            }
+
+            var data = new int[length];
+            var buffer = new byte[4];
+            for (var i = 0; i < length; i++)
+            {
+                stream.Read(buffer, 0, 4);
+                data[i] = BitConverter.ToInt32(buffer.EnsureBigEndian(), 0);
+            }
+
+            Data = data;
+        }
     }
 }
