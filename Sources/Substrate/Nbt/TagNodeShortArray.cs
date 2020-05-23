@@ -8,8 +8,6 @@ namespace Substrate.Nbt
 {
     public sealed class TagNodeShortArray : TagNode
     {
-        private short[] _data = null;
-
         /// <summary>
         /// Converts the node to itself.
         /// </summary>
@@ -31,18 +29,14 @@ namespace Substrate.Nbt
         /// <summary>
         /// Gets or sets an short array of tag data.
         /// </summary>
-        public short[] Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
+        public short[] Data { get; set; }
 
         /// <summary>
         /// Gets the length of the stored short array.
         /// </summary>
         public int Length
         {
-            get { return _data.Length; }
+            get { return Data.Length; }
         }
 
         /// <summary>
@@ -56,7 +50,7 @@ namespace Substrate.Nbt
         /// <param name="d">The value to set the node's tag data value.</param>
         public TagNodeShortArray (short[] d)
         {
-            _data = d;
+            Data = d;
         }
 
         /// <summary>
@@ -65,8 +59,8 @@ namespace Substrate.Nbt
         /// <returns>A new int array node representing the same data.</returns>
         public override TagNode Copy ()
         {
-            short[] arr = new short[_data.Length];
-            _data.CopyTo(arr, 0);
+            short[] arr = new short[Data.Length];
+            Data.CopyTo(arr, 0);
 
             return new TagNodeShortArray(arr);
         }
@@ -77,7 +71,7 @@ namespace Substrate.Nbt
         /// <returns>String representation of the node's data.</returns>
         public override string ToString ()
         {
-            return _data.ToString();
+            return Data.ToString();
         }
 
         /// <summary>
@@ -87,8 +81,8 @@ namespace Substrate.Nbt
         /// <returns>The short value at the given index of the stored short array.</returns>
         public short this[int index]
         {
-            get { return _data[index]; }
-            set { _data[index] = value; }
+            get { return Data[index]; }
+            set { Data[index] = value; }
         }
 
         /// <summary>
@@ -108,7 +102,7 @@ namespace Substrate.Nbt
         /// <returns>A system short array set to the node's data.</returns>
         public static implicit operator short[] (TagNodeShortArray i)
         {
-            return i._data;
+            return i.Data;
         }
 
         internal override void SerializeValue(Stream stream)

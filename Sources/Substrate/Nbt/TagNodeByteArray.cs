@@ -9,8 +9,6 @@ namespace Substrate.Nbt
     /// </summary>
     public sealed class TagNodeByteArray : TagNode
     {
-        private byte[] _data = null;
-
         /// <summary>
         /// Converts the node to itself.
         /// </summary>
@@ -32,18 +30,14 @@ namespace Substrate.Nbt
         /// <summary>
         /// Gets or sets a byte array of tag data.
         /// </summary>
-        public byte[] Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
+        public byte[] Data { get; set; }
 
         /// <summary>
         /// Gets the length of the stored byte array.
         /// </summary>
         public int Length
         {
-            get { return _data.Length; }
+            get { return Data.Length; }
         }
 
         /// <summary>
@@ -57,7 +51,7 @@ namespace Substrate.Nbt
         /// <param name="d">The value to set the node's tag data value.</param>
         public TagNodeByteArray (byte[] d)
         {
-            _data = d;
+            Data = d;
         }
 
         /// <summary>
@@ -66,8 +60,8 @@ namespace Substrate.Nbt
         /// <returns>A new byte array node representing the same data.</returns>
         public override TagNode Copy ()
         {
-            byte[] arr = new byte[_data.Length];
-            _data.CopyTo(arr, 0);
+            byte[] arr = new byte[Data.Length];
+            Data.CopyTo(arr, 0);
 
             return new TagNodeByteArray(arr);
         }
@@ -78,7 +72,7 @@ namespace Substrate.Nbt
         /// <returns>String representation of the node's data.</returns>
         public override string ToString ()
         {
-            return _data.ToString();
+            return Data.ToString();
         }
 
         /// <summary>
@@ -88,8 +82,8 @@ namespace Substrate.Nbt
         /// <returns>The byte value at the given index of the stored byte array.</returns>
         public byte this[int index]
         {
-            get { return _data[index]; }
-            set { _data[index] = value; }
+            get { return Data[index]; }
+            set { Data[index] = value; }
         }
 
         /// <summary>
@@ -109,7 +103,7 @@ namespace Substrate.Nbt
         /// <returns>A system byte array set to the node's data.</returns>
         public static implicit operator byte[] (TagNodeByteArray b)
         {
-            return b._data;
+            return b.Data;
         }
 
         internal override void SerializeValue(Stream stream)

@@ -7,32 +7,23 @@ namespace Substrate.Nbt
     /// </summary>
     public sealed class SchemaNodeString : SchemaNode
     {
-        private string _value = "";
-        private int _length;
-
         /// <summary>
         /// Gets the maximum length of a valid string.
         /// </summary>
-        public int Length
-        {
-            get { return _length; }
-        }
+        public int Length { get; }
 
         /// <summary>
         /// Gets the expected value of a valid string.
         /// </summary>
         /// <remarks>A <see cref="TagNodeString"/> must be set to this value to be considered valid.</remarks>
-        public string Value
-        {
-            get { return _value; }
-        }
+        public string Value { get; } = "";
 
         /// <summary>
         /// Indicates whether there is a maximum-length constraint on strings in this node.
         /// </summary>
         public bool HasMaxLength
         {
-            get { return _length > 0; }
+            get { return Length > 0; }
         }
 
         /// <summary>
@@ -62,7 +53,7 @@ namespace Substrate.Nbt
         public SchemaNodeString (string name, string value)
             : base(name)
         {
-            _value = value;
+            Value = value;
         }
 
         /// <summary>
@@ -74,7 +65,7 @@ namespace Substrate.Nbt
         public SchemaNodeString (string name, string value, SchemaOptions options)
             : base(name, options)
         {
-            _value = value;
+            Value = value;
         }
 
         /// <summary>
@@ -85,7 +76,7 @@ namespace Substrate.Nbt
         public SchemaNodeString (string name, int length)
             : base(name)
         {
-            _length = length;
+            Length = length;
         }
 
         /// <summary>
@@ -97,7 +88,7 @@ namespace Substrate.Nbt
         public SchemaNodeString (string name, int length, SchemaOptions options)
             : base(name, options)
         {
-            _length = length;
+            Length = length;
         }
 
         /// <summary>
@@ -106,8 +97,8 @@ namespace Substrate.Nbt
         /// <returns>A <see cref="TagNodeString"/> with a sensible default value.  If this node represents a particular string, the <see cref="TagNodeString"/> constructed will be set to that string.</returns>
         public override TagNode BuildDefaultTree ()
         {
-            if (_value.Length > 0) {
-                return new TagNodeString(_value);
+            if (Value.Length > 0) {
+                return new TagNodeString(Value);
             }
 
             return new TagNodeString();

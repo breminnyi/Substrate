@@ -9,22 +9,17 @@ namespace Substrate.Nbt
     /// </summary>
     public sealed class SchemaNodeShortArray : SchemaNode
     {
-        private int _length;
-
         /// <summary>
         /// Gets the expected length of the corresponding int array.
         /// </summary>
-        public int Length
-        {
-            get { return _length; }
-        }
+        public int Length { get; }
 
         /// <summary>
         /// Indicates whether there is an expected length of the corresponding int array.
         /// </summary>
         public bool HasExpectedLength
         {
-            get { return _length > 0; }
+            get { return Length > 0; }
         }
 
         /// <summary>
@@ -34,7 +29,7 @@ namespace Substrate.Nbt
         public SchemaNodeShortArray (string name)
             : base(name)
         {
-            _length = 0;
+            Length = 0;
         }
 
         /// <summary>
@@ -45,7 +40,7 @@ namespace Substrate.Nbt
         public SchemaNodeShortArray (string name, SchemaOptions options)
             : base(name, options)
         {
-            _length = 0;
+            Length = 0;
         }
 
         /// <summary>
@@ -56,7 +51,7 @@ namespace Substrate.Nbt
         public SchemaNodeShortArray (string name, int length)
             : base(name)
         {
-            _length = length;
+            Length = length;
         }
 
         /// <summary>
@@ -68,7 +63,7 @@ namespace Substrate.Nbt
         public SchemaNodeShortArray (string name, int length, SchemaOptions options)
             : base(name, options)
         {
-            _length = length;
+            Length = length;
         }
 
         /// <summary>
@@ -77,7 +72,7 @@ namespace Substrate.Nbt
         /// <returns>A <see cref="TagNodeString"/> with a sensible default value.</returns>
         public override TagNode BuildDefaultTree ()
         {
-            return new TagNodeShortArray(new short[_length]);
+            return new TagNodeShortArray(new short[Length]);
         }
     }
 }

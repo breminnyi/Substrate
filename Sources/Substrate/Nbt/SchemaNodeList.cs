@@ -7,40 +7,27 @@ namespace Substrate.Nbt
     /// </summary>
     public sealed class SchemaNodeList : SchemaNode
     {
-        private TagType _type;
-        private int _length;
-        private SchemaNode _subschema;
-
         /// <summary>
         /// Gets the expected number of items contained in the corresponding <see cref="TagNodeList"/>.
         /// </summary>
-        public int Length
-        {
-            get { return _length; }
-        }
+        public int Length { get; }
 
         /// <summary>
         /// Gets the expected <see cref="TagType"/> of the items contained in the corresponding <see cref="TagNodeList"/>.
         /// </summary>
-        public TagType Type
-        {
-            get { return _type; }
-        }
+        public TagType Type { get; }
 
         /// <summary>
         /// Gets a <see cref="SchemaNode"/> representing a schema that items contained in the corresponding <see cref="TagNodeList"/> should be verified against.
         /// </summary>
-        public SchemaNode SubSchema
-        {
-            get { return _subschema; }
-        }
+        public SchemaNode SubSchema { get; }
 
         /// <summary>
         /// Indicates whether there is an expected number of items of the corresponding <see cref="TagNodeList"/>.
         /// </summary>
         public bool HasExpectedLength
         {
-            get { return _length > 0; }
+            get { return Length > 0; }
         }
 
         /// <summary>
@@ -51,7 +38,7 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type)
             : base(name)
         {
-            _type = type;
+            Type = type;
         }
 
         /// <summary>
@@ -63,7 +50,7 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type, SchemaOptions options)
             : base(name, options)
         {
-            _type = type;
+            Type = type;
         }
 
         /// <summary>
@@ -75,8 +62,8 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type, int length)
             : base(name)
         {
-            _type = type;
-            _length = length;
+            Type = type;
+            Length = length;
         }
 
         /// <summary>
@@ -89,8 +76,8 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type, int length, SchemaOptions options)
             : base(name, options)
         {
-            _type = type;
-            _length = length;
+            Type = type;
+            Length = length;
         }
 
         /// <summary>
@@ -102,8 +89,8 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type, SchemaNode subschema)
             : base(name)
         {
-            _type = type;
-            _subschema = subschema;
+            Type = type;
+            SubSchema = subschema;
         }
 
         /// <summary>
@@ -116,8 +103,8 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type, SchemaNode subschema, SchemaOptions options)
             : base(name, options)
         {
-            _type = type;
-            _subschema = subschema;
+            Type = type;
+            SubSchema = subschema;
         }
 
         /// <summary>
@@ -130,9 +117,9 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type, int length, SchemaNode subschema)
             : base(name)
         {
-            _type = type;
-            _length = length;
-            _subschema = subschema;
+            Type = type;
+            Length = length;
+            SubSchema = subschema;
         }
 
         /// <summary>
@@ -146,9 +133,9 @@ namespace Substrate.Nbt
         public SchemaNodeList (string name, TagType type, int length, SchemaNode subschema, SchemaOptions options)
             : base(name, options)
         {
-            _type = type;
-            _length = length;
-            _subschema = subschema;
+            Type = type;
+            Length = length;
+            SubSchema = subschema;
         }
 
         /// <summary>
@@ -157,13 +144,13 @@ namespace Substrate.Nbt
         /// <returns>A <see cref="TagNodeList"/> with a sensible default value.  If a length is specified, default child <see cref="TagNode"/> objects of the necessary type will be created and added to the <see cref="TagNodeList"/>.</returns>
         public override TagNode BuildDefaultTree ()
         {
-            if (_length == 0) {
-                return new TagNodeList(_type);
+            if (Length == 0) {
+                return new TagNodeList(Type);
             }
 
-            TagNodeList list = new TagNodeList(_type);
-            for (int i = 0; i < _length; i++) {
-                list.Add(_subschema.BuildDefaultTree());
+            TagNodeList list = new TagNodeList(Type);
+            for (int i = 0; i < Length; i++) {
+                list.Add(SubSchema.BuildDefaultTree());
             }
 
             return list;

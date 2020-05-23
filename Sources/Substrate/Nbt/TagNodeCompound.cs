@@ -33,10 +33,7 @@ namespace Substrate.Nbt
         /// <summary>
         /// Gets the number of subnodes contained in node.
         /// </summary>
-        public int Count
-        {
-            get { return _tags.Count; }
-        }
+        public int Count => _tags.Count;
 
         /// <summary>
         /// Constructs a new empty compound node.

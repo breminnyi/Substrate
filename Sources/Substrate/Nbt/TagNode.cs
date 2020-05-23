@@ -4,57 +4,55 @@ using System.IO;
 using System.Text;
 using Substrate.Core;
 
-namespace Substrate.Nbt 
+namespace Substrate.Nbt
 {
     /// <summary>
     /// An abstract base class representing a node in an NBT tree.
     /// </summary>
     public abstract class TagNode : ICopyable<TagNode>
     {
-        protected internal abstract void Deserialize(Stream stream);
-        
         /// <summary>
         /// Convert this node to a byte tag type if supported.
         /// </summary>
         /// <returns>A new byte node.</returns>
-        public virtual TagNodeByte ToTagByte ()
-        { 
-            throw new InvalidCastException(); 
+        public virtual TagNodeByte ToTagByte()
+        {
+            throw new InvalidCastException();
         }
 
         /// <summary>
         /// Convert this node to a short tag type if supported.
         /// </summary>
         /// <returns>A new short node.</returns>
-        public virtual TagNodeShort ToTagShort () 
-        { 
-            throw new InvalidCastException(); 
+        public virtual TagNodeShort ToTagShort()
+        {
+            throw new InvalidCastException();
         }
 
         /// <summary>
         /// Convert this node to an int tag type if supported.
         /// </summary>
         /// <returns>A new int node.</returns>
-        public virtual TagNodeInt ToTagInt ()
-        { 
-            throw new InvalidCastException(); 
+        public virtual TagNodeInt ToTagInt()
+        {
+            throw new InvalidCastException();
         }
 
         /// <summary>
         /// Convert this node to a long tag type if supported.
         /// </summary>
         /// <returns>A new long node.</returns>
-        public virtual TagNodeLong ToTagLong () 
+        public virtual TagNodeLong ToTagLong()
         {
-            throw new InvalidCastException(); 
+            throw new InvalidCastException();
         }
 
         /// <summary>
         /// Convert this node to a float tag type if supported.
         /// </summary>
         /// <returns>A new float node.</returns>
-        public virtual TagNodeFloat ToTagFloat () 
-        { 
+        public virtual TagNodeFloat ToTagFloat()
+        {
             throw new InvalidCastException();
         }
 
@@ -62,7 +60,7 @@ namespace Substrate.Nbt
         /// Convert this node to a double tag type if supported.
         /// </summary>
         /// <returns>A new double node.</returns>
-        public virtual TagNodeDouble ToTagDouble () 
+        public virtual TagNodeDouble ToTagDouble()
         {
             throw new InvalidCastException();
         }
@@ -71,7 +69,7 @@ namespace Substrate.Nbt
         /// Convert this node to a byte array tag type if supported.
         /// </summary>
         /// <returns>A new byte array node.</returns>
-        public virtual TagNodeByteArray ToTagByteArray () 
+        public virtual TagNodeByteArray ToTagByteArray()
         {
             throw new InvalidCastException();
         }
@@ -80,16 +78,16 @@ namespace Substrate.Nbt
         /// Convert this node to a string tag type if supported.
         /// </summary>
         /// <returns>A new string node.</returns>
-        public virtual TagNodeString ToTagString () 
-        { 
-            throw new InvalidCastException(); 
+        public virtual TagNodeString ToTagString()
+        {
+            throw new InvalidCastException();
         }
 
         /// <summary>
         /// Convert this node to a list tag type if supported.
         /// </summary>
         /// <returns>A new list node.</returns>
-        public virtual TagNodeList ToTagList ()
+        public virtual TagNodeList ToTagList()
         {
             throw new InvalidCastException();
         }
@@ -98,16 +96,16 @@ namespace Substrate.Nbt
         /// Convert this node to a compound tag type if supported.
         /// </summary>
         /// <returns>A new compound node.</returns>
-        public virtual TagNodeCompound ToTagCompound () 
+        public virtual TagNodeCompound ToTagCompound()
         {
-            throw new InvalidCastException(); 
+            throw new InvalidCastException();
         }
 
         /// <summary>
         /// Conver this node to an int array tag type if supported.
         /// </summary>
         /// <returns>A new int array node.</returns>
-        public virtual TagNodeIntArray ToTagIntArray ()
+        public virtual TagNodeIntArray ToTagIntArray()
         {
             throw new InvalidCastException();
         }
@@ -116,7 +114,7 @@ namespace Substrate.Nbt
         /// Conver this node to a long array tag type if supported.
         /// </summary>
         /// <returns>A new long array node.</returns>
-        public virtual TagNodeLongArray ToTagLongArray ()
+        public virtual TagNodeLongArray ToTagLongArray()
         {
             throw new InvalidCastException();
         }
@@ -125,7 +123,7 @@ namespace Substrate.Nbt
         /// Conver this node to a short array tag type if supported.
         /// </summary>
         /// <returns>A new short array node.</returns>
-        public virtual TagNodeShortArray ToTagShortArray ()
+        public virtual TagNodeShortArray ToTagShortArray()
         {
             throw new InvalidCastException();
         }
@@ -134,9 +132,9 @@ namespace Substrate.Nbt
         /// Gets the underlying tag type of the node.
         /// </summary>
         /// <returns>An NBT tag type.</returns>
-        public virtual TagType GetTagType () 
+        public virtual TagType GetTagType()
         {
-            return TagType.TAG_END; 
+            return TagType.TAG_END;
         }
 
         /// <summary>
@@ -144,7 +142,7 @@ namespace Substrate.Nbt
         /// </summary>
         /// <param name="type">An NBT tag type.</param>
         /// <returns>Status indicating whether this object could be cast to a node type represented by the given tag type.</returns>
-        public virtual bool IsCastableTo (TagType type)
+        public virtual bool IsCastableTo(TagType type)
         {
             return type == GetTagType();
         }
@@ -153,7 +151,7 @@ namespace Substrate.Nbt
         /// Makes a deep copy of the NBT node.
         /// </summary>
         /// <returns>A new NBT node.</returns>
-        public virtual TagNode Copy ()
+        public virtual TagNode Copy()
         {
             return null;
         }
@@ -166,5 +164,7 @@ namespace Substrate.Nbt
         }
 
         internal abstract void SerializeValue(Stream stream);
+
+        protected internal abstract void Deserialize(Stream stream);
     }
 }

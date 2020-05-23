@@ -9,8 +9,6 @@ namespace Substrate.Nbt
     /// </summary>
     public sealed class TagNodeShort : TagNode
     {
-        private short _data = 0;
-
         /// <summary>
         /// Converts the node to itself.
         /// </summary>
@@ -26,7 +24,7 @@ namespace Substrate.Nbt
         /// <returns>An int node representing the same data.</returns>
         public override TagNodeInt ToTagInt()
         {
-            return new TagNodeInt(_data);
+            return new TagNodeInt(Data);
         }
 
         /// <summary>
@@ -35,7 +33,7 @@ namespace Substrate.Nbt
         /// <returns>A long node representing the same data.</returns>
         public override TagNodeLong ToTagLong()
         {
-            return new TagNodeLong(_data);
+            return new TagNodeLong(Data);
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace Substrate.Nbt
         /// <returns>A float node representing the same data.</returns>
         public override TagNodeFloat ToTagFloat()
         {
-            return new TagNodeFloat(_data);
+            return new TagNodeFloat(Data);
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace Substrate.Nbt
         /// <returns>A double node representing the same data.</returns>
         public override TagNodeDouble ToTagDouble()
         {
-            return new TagNodeDouble(_data);
+            return new TagNodeDouble(Data);
         }
 
         /// <summary>
@@ -82,11 +80,7 @@ namespace Substrate.Nbt
         /// <summary>
         /// Gets or sets a short of tag data.
         /// </summary>
-        public short Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
+        public short Data { get; set; }
 
         /// <summary>
         /// Constructs a new short node with a data value of 0.
@@ -99,7 +93,7 @@ namespace Substrate.Nbt
         /// <param name="d">The value to set the node's tag data value.</param>
         public TagNodeShort(short d)
         {
-            _data = d;
+            Data = d;
         }
 
         /// <summary>
@@ -108,7 +102,7 @@ namespace Substrate.Nbt
         /// <returns>A new short node representing the same data.</returns>
         public override TagNode Copy()
         {
-            return new TagNodeShort(_data);
+            return new TagNodeShort(Data);
         }
 
         /// <summary>
@@ -117,7 +111,7 @@ namespace Substrate.Nbt
         /// <returns>String representation of the node's data.</returns>
         public override string ToString()
         {
-            return _data.ToString();
+            return Data.ToString();
         }
 
         /// <summary>
@@ -147,7 +141,7 @@ namespace Substrate.Nbt
         /// <returns>A system short set to the node's data value.</returns>
         public static implicit operator short(TagNodeShort s)
         {
-            return s._data;
+            return s.Data;
         }
 
         /// <summary>
@@ -157,7 +151,7 @@ namespace Substrate.Nbt
         /// <returns>A system int set to the node's data value.</returns>
         public static implicit operator int(TagNodeShort s)
         {
-            return s._data;
+            return s.Data;
         }
 
         /// <summary>
@@ -167,7 +161,7 @@ namespace Substrate.Nbt
         /// <returns>A system long set to the node's data value.</returns>
         public static implicit operator long(TagNodeShort s)
         {
-            return s._data;
+            return s.Data;
         }
 
         internal override void SerializeValue(Stream stream)

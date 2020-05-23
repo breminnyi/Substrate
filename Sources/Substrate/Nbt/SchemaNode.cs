@@ -9,24 +9,15 @@ namespace Substrate.Nbt
     /// </summary>
     public abstract class SchemaNode
     {
-        private string _name;
-        private SchemaOptions _options;
-
         /// <summary>
         /// Gets the name of an expected NBT node.
         /// </summary>
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; }
 
         /// <summary>
         /// Gets additional schema options defined for this node.
         /// </summary>
-        public SchemaOptions Options
-        {
-            get { return _options; }
-        }
+        public SchemaOptions Options { get; }
 
         /// <summary>
         /// Constructs a new <see cref="SchemaNode"/> representing a <see cref="TagNode"/> named <paramref name="name"/>.
@@ -34,7 +25,7 @@ namespace Substrate.Nbt
         /// <param name="name">The name of the corresponding <see cref="TagNode"/>.</param>
         protected SchemaNode (string name)
         {
-            _name = name;
+            Name = name;
         }
 
         /// <summary>
@@ -44,8 +35,8 @@ namespace Substrate.Nbt
         /// <param name="options">One or more option flags modifying the processing of this node.</param>
         protected SchemaNode (string name, SchemaOptions options)
         {
-            _name = name;
-            _options = options;
+            Name = name;
+            Options = options;
         }
 
         /// <summary>

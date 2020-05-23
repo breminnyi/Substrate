@@ -30,42 +30,25 @@ namespace Substrate.Nbt
     /// </summary>
     public class TagEventArgs : EventArgs
     {
-        private string _tagName;
-        private TagNode _parent;
-        private TagNode _tag;
-        private SchemaNode _schema;
-
         /// <summary>
         /// Gets the expected name of the <see cref="TagNode"/> referenced by this event.
         /// </summary>
-        public string TagName
-        {
-            get { return _tagName; }
-        }
+        public string TagName { get; }
 
         /// <summary>
         /// Gets the parent  <see cref="TagNode"/> of the <see cref="TagNode"/> referenced by this event, if it exists.
         /// </summary>
-        public TagNode Parent
-        {
-            get { return _parent; }
-        }
+        public TagNode Parent { get; }
 
         /// <summary>
         /// Gets the <see cref="TagNode"/> referenced by this event.
         /// </summary>
-        public TagNode Tag
-        {
-            get { return _tag; }
-        }
+        public TagNode Tag { get; }
 
         /// <summary>
         /// Gets the <see cref="SchemaNode"/> corresponding to the <see cref="TagNode"/> referenced by this event.
         /// </summary>
-        public SchemaNode Schema
-        {
-            get { return _schema; }
-        }
+        public SchemaNode Schema { get; }
 
         /// <summary>
         /// Constructs a new event argument set.
@@ -74,7 +57,7 @@ namespace Substrate.Nbt
         public TagEventArgs (string tagName)
             : base()
         {
-            _tagName = tagName;
+            TagName = tagName;
         }
 
         /// <summary>
@@ -85,8 +68,8 @@ namespace Substrate.Nbt
         public TagEventArgs (string tagName, TagNode tag)
             : base()
         {
-            _tag = tag;
-            _tagName = tagName;
+            Tag = tag;
+            TagName = tagName;
         }
 
         /// <summary>
@@ -97,8 +80,8 @@ namespace Substrate.Nbt
         public TagEventArgs (SchemaNode schema, TagNode tag)
             : base()
         {
-            _tag = tag;
-            _schema = schema;
+            Tag = tag;
+            Schema = schema;
         }
     }
 

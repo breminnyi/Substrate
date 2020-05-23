@@ -7,15 +7,10 @@ namespace Substrate.Nbt
     /// </summary>
     public sealed class SchemaNodeScaler : SchemaNode
     {
-        private TagType _type;
-
         /// <summary>
         /// Gets the scaler <see cref="TagType"/> that this node represents.
         /// </summary>
-        public TagType Type
-        {
-            get { return _type; }
-        }
+        public TagType Type { get; }
 
         /// <summary>
         /// Constructs a new <see cref="SchemaNodeScaler"/> representing a <see cref="TagNode"/> named <paramref name="name"/> and of type <paramref name="type"/>.
@@ -25,7 +20,7 @@ namespace Substrate.Nbt
         public SchemaNodeScaler (string name, TagType type)
             : base(name)
         {
-            _type = type;
+            Type = type;
         }
 
         /// <summary>
@@ -37,7 +32,7 @@ namespace Substrate.Nbt
         public SchemaNodeScaler (string name, TagType type, SchemaOptions options)
             : base(name, options)
         {
-            _type = type;
+            Type = type;
         }
 
         /// <summary>
@@ -46,7 +41,7 @@ namespace Substrate.Nbt
         /// <returns>A <see cref="TagNode"/> with a sensible default value.</returns>
         public override TagNode BuildDefaultTree ()
         {
-            switch (_type) {
+            switch (Type) {
                 case TagType.TAG_STRING:
                     return new TagNodeString();
 
