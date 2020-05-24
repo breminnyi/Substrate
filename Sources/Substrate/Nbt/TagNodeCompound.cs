@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Substrate.Nbt
 {
@@ -90,6 +91,16 @@ namespace Substrate.Nbt
             stream.WriteByte((byte)TagType.TAG_END);
         }
 
+        internal override async Task SerializeValueAsync(Stream stream)
+        {
+            foreach (var pair in this)
+            {
+                await pair.Value.SerializeAsync(pair.Key, stream).ConfigureAwait(false);
+            }
+
+            await stream.WriteAsync(new[] {(byte) TagType.TAG_END}, 0, 1).ConfigureAwait(false);
+        }
+
         protected internal override void Deserialize(Stream stream)
         {
             while (ReadTag(this, stream))
@@ -106,6 +117,31 @@ namespace Substrate.Nbt
                 nameTag.Deserialize(stream);
                 var tag = TagNodeFactory.Instance.Create(type);
                 tag.Deserialize(stream);
+                parent[nameTag] = tag;
+                return true;
+            }
+
+            return false;
+        }
+
+        public override async Task DeserializeAsync(Stream stream)
+        {
+            while (await ReadTagAsync(this, stream).ConfigureAwait(false))
+            {
+            }
+        }
+        
+        private static async Task<bool> ReadTagAsync(TagNodeCompound parent, Stream stream)
+        {
+            var buffer = new byte[1];
+            await stream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
+            var type = (TagType) buffer[0];
+            if (type != TagType.TAG_END)
+            {
+                var nameTag = new TagNodeString();
+                await nameTag.DeserializeAsync(stream).ConfigureAwait(false);
+                var tag = TagNodeFactory.Instance.Create(type);
+                await tag.DeserializeAsync(stream).ConfigureAwait(false);
                 parent[nameTag] = tag;
                 return true;
             }

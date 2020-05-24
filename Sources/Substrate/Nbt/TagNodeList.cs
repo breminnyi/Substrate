@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Substrate.Utilities;
 
 namespace Substrate.Nbt
@@ -164,6 +165,19 @@ namespace Substrate.Nbt
             }
         }
 
+        internal override async Task SerializeValueAsync(Stream stream)
+        {
+            var lenBytes = BitConverter.GetBytes(Count).EnsureBigEndian();
+            
+            await stream.WriteAsync(new[]{(byte) ValueType},0,1).ConfigureAwait(false);
+            await stream.WriteAsync(lenBytes, 0, 4).ConfigureAwait(false);
+
+            foreach (var item in _items)
+            {
+                await item.SerializeValueAsync(stream).ConfigureAwait(false);
+            }
+        }
+
         protected internal override void Deserialize(Stream stream)
         {
             var gzByte = stream.ReadByte();
@@ -190,6 +204,37 @@ namespace Substrate.Nbt
             {
                 var child = TagNodeFactory.Instance.Create(ValueType);
                 child.Deserialize(stream);
+                Add(child);
+            }
+        }
+
+        public override async Task DeserializeAsync(Stream stream)
+        {
+            var buffer = new byte[1];
+            var read = await stream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
+            if (read != 1)
+            {
+                throw new NbtException(NbtException.MSG_GZIP_ENDOFSTREAM);
+            }
+
+            ValueType = (TagType) buffer[0];
+            if (ValueType > (TagType) Enum.GetValues(typeof(TagType)).GetUpperBound(0))
+            {
+                throw new NbtException(NbtException.MSG_READ_TYPE);
+            }
+
+            var lenBytes = new byte[4];
+            await stream.ReadAsync(lenBytes, 0, 4).ConfigureAwait(false);
+            var length = BitConverter.ToInt32(lenBytes.EnsureBigEndian(), 0);
+            if (length < 0)
+            {
+                throw new NbtException(NbtException.MSG_READ_NEG);
+            }
+
+            for (var i = 0; i < length; i++)
+            {
+                var child = TagNodeFactory.Instance.Create(ValueType);
+                await child.DeserializeAsync(stream).ConfigureAwait(false);
                 Add(child);
             }
         }

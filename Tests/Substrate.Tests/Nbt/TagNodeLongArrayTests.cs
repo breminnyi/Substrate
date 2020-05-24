@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Substrate.Nbt;
 using Substrate.Utilities;
 using Xunit;
@@ -20,6 +21,24 @@ namespace Substrate.Tests.Nbt
             {
                 var tag = new TagNodeLongArray();
                 tag.Deserialize(ms);
+                actual = tag.Data;
+            }
+
+            Assert.Equal<long>(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(new long[0])]
+        [InlineData(new long[] {long.MinValue, -1000, -100, -10, -1, 0, 1, 10, 100, 1000, long.MaxValue})]
+        public async Task DeserializeAsyncReadsCorrectData(long[] expected)
+        {
+            var input = Encode(expected);
+
+            long[] actual;
+            using (var ms = new MemoryStream(input))
+            {
+                var tag = new TagNodeLongArray();
+                await tag.DeserializeAsync(ms).ConfigureAwait(false);
                 actual = tag.Data;
             }
 

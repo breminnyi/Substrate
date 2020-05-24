@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Substrate.Core;
 
 namespace Substrate.Nbt
@@ -163,8 +164,19 @@ namespace Substrate.Nbt
             SerializeValue(stream);
         }
 
+        public async Task SerializeAsync(string name, Stream stream)
+        {
+            await stream.WriteAsync(new[] {(byte) GetTagType()}, 0, 1).ConfigureAwait(false);
+            await new TagNodeString(name).SerializeValueAsync(stream).ConfigureAwait(false);
+            await SerializeValueAsync(stream).ConfigureAwait(false);
+        }
+
         internal abstract void SerializeValue(Stream stream);
 
+        internal virtual Task SerializeValueAsync(Stream stream) => Task.FromException(new NotImplementedException());
+
         protected internal abstract void Deserialize(Stream stream);
+
+        public virtual Task DeserializeAsync(Stream stream) => Task.FromException(new NotImplementedException());
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Substrate.Nbt;
 using Substrate.Utilities;
 using Xunit;
@@ -20,6 +21,24 @@ namespace Substrate.Tests.Nbt
             {
                 var tag = new TagNodeByteArray();
                 tag.Deserialize(ms);
+                actual = tag.Data;
+            }
+            
+            Assert.Equal<byte>(expected, actual);
+        }
+        
+        [Theory]
+        [InlineData(new byte[0])]
+        [InlineData(new byte[] {0xFF, 0xF7, 0x77, 0x7F, 0x00, 0x12, 0x20, 0x40})]
+        public async Task DeserializeAsyncReadsCorrectData(byte[] expected)
+        {
+            var input = Encode(expected);
+
+            byte[] actual;
+            using (var ms = new MemoryStream(input))
+            {
+                var tag = new TagNodeByteArray();
+                await tag.DeserializeAsync(ms).ConfigureAwait(false);
                 actual = tag.Data;
             }
             

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Substrate.Nbt
 {
@@ -160,6 +161,11 @@ namespace Substrate.Nbt
             stream.WriteByte(Data);
         }
 
+        internal override Task SerializeValueAsync(Stream stream)
+        {
+            return stream.WriteAsync(new[] {Data}, 0, 1);
+        }
+
         protected internal override void Deserialize(Stream stream)
         {
             var value = stream.ReadByte();
@@ -169,6 +175,18 @@ namespace Substrate.Nbt
             }
 
             Data = (byte) value;
+        }
+
+        public override async Task DeserializeAsync(Stream stream)
+        {
+            var buffer = new byte[1];
+            var read = await stream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
+            if (read != 1)
+            {
+                throw new NbtException(NbtException.MSG_GZIP_ENDOFSTREAM);
+            }
+
+            Data = buffer[0];
         }
     }
 }

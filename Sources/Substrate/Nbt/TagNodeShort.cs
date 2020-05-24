@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Substrate.Utilities;
 
 namespace Substrate.Nbt
@@ -170,10 +171,23 @@ namespace Substrate.Nbt
             stream.Write(gzBytes, 0, 2);
         }
 
+        internal override Task SerializeValueAsync(Stream stream)
+        {
+            var gzBytes = BitConverter.GetBytes(Data).EnsureBigEndian();
+            return stream.WriteAsync(gzBytes, 0, 2);
+        }
+
         protected internal override void Deserialize(Stream stream)
         {
             var gzBytes = new byte[2];
             stream.Read(gzBytes, 0, 2);
+            Data = BitConverter.ToInt16(gzBytes.EnsureBigEndian(), 0);
+        }
+
+        public override async Task DeserializeAsync(Stream stream)
+        {
+            var gzBytes = new byte[2];
+            await stream.ReadAsync(gzBytes, 0, 2).ConfigureAwait(false);
             Data = BitConverter.ToInt16(gzBytes.EnsureBigEndian(), 0);
         }
     }

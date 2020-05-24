@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 using Substrate.Core;
 using Substrate.Utilities;
 
@@ -88,6 +89,33 @@ namespace Substrate.Nbt
                 Root = null;
             }
         }
+        
+        /// <summary>
+        /// Rebuild the internal NBT tree from a source data stream.
+        /// </summary>
+        /// <param name="stream">An open, readable data stream containing NBT data.</param>
+        public async Task ReadFromAsync(Stream stream)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            var buffer = new byte[1];
+            await stream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
+            var type = (TagType) buffer[0];
+            if (type == TagType.TAG_COMPOUND)
+            {
+                var nameTag = new TagNodeString();
+                await nameTag.DeserializeAsync(stream).ConfigureAwait(false);
+                Name = nameTag.Data; // name
+
+                var rootTag = TagNodeFactory.Instance.Create(type);
+                await rootTag.DeserializeAsync(stream).ConfigureAwait(false);
+                Root = (TagNodeCompound) rootTag;
+            }
+            else
+            {
+                Root = null;
+            }
+        }
 
         /// <summary>
         /// Writes out the internal NBT tree to a destination data stream.
@@ -98,6 +126,13 @@ namespace Substrate.Nbt
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (Root == null) throw new InvalidOperationException("NBT tree not initialized yet.");
             Root.Serialize(Name, stream);
+        }
+        
+        public Task WriteToAsync(Stream stream)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (Root == null) throw new InvalidOperationException("NBT tree not initialized yet.");
+            return Root.SerializeAsync(Name, stream);
         }
 
         #region ICopyable<NBT_Tree> Members

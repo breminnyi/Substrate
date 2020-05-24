@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Substrate.Utilities;
 
 namespace Substrate.Nbt
@@ -119,6 +120,20 @@ namespace Substrate.Nbt
             stream.Write(data, 0, data.Length);
         }
 
+        internal override async Task SerializeValueAsync(Stream stream)
+        {
+            var lenBytes = BitConverter.GetBytes(Length).EnsureBigEndian();
+            await stream.WriteAsync(lenBytes, 0, 4).ConfigureAwait(false);
+            var data = new byte[Length * 2];
+            for (var i = 0; i < Length; i++)
+            {
+                var buffer = BitConverter.GetBytes(Data[i]).EnsureBigEndian();
+                Array.Copy(buffer, 0, data, i * 2, 2);
+            }
+
+            await stream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
+        }
+
         protected internal override void Deserialize(Stream stream)
         {
             var lenBytes = new byte[4];
@@ -134,6 +149,27 @@ namespace Substrate.Nbt
             for (var i = 0; i < length; i++)
             {
                 stream.Read(buffer, 0, 2);
+                data[i] = BitConverter.ToInt16(buffer.EnsureBigEndian(), 0);
+            }
+
+            Data = data;
+        }
+
+        public override async Task DeserializeAsync(Stream stream)
+        {
+            var lenBytes = new byte[4];
+            await stream.ReadAsync(lenBytes, 0, 4).ConfigureAwait(false);
+            var length = BitConverter.ToInt32(lenBytes.EnsureBigEndian(), 0);
+            if (length < 0)
+            {
+                throw new NbtException(NbtException.MSG_READ_NEG);
+            }
+
+            var data = new short[length];
+            var buffer = new byte[2];
+            for (var i = 0; i < length; i++)
+            {
+                await stream.ReadAsync(buffer, 0, 2).ConfigureAwait(false);
                 data[i] = BitConverter.ToInt16(buffer.EnsureBigEndian(), 0);
             }
 

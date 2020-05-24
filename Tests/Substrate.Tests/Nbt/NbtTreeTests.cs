@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading.Tasks;
 using Ionic.Zlib;
 using Substrate.Nbt;
 using Xunit;
@@ -9,12 +10,12 @@ namespace Substrate.Tests.Nbt
     public class NbtTreeTests
     {
         private readonly ITestOutputHelper _output;
-        
+
         public NbtTreeTests(ITestOutputHelper output)
         {
             _output = output;
         }
-        
+
         private byte[] ReadFile(string file)
         {
             using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -56,6 +57,31 @@ namespace Substrate.Tests.Nbt
             using (var ms = new MemoryStream())
             {
                 tree.WriteTo(ms);
+                output = ms.ToArray();
+            }
+
+            CompareCollections(input, output);
+        }
+
+        [Theory]
+        [InlineData(@"..\..\..\Data\1_8_3-debug\level.dat")]
+        [InlineData(@"..\..\..\Data\1_8_3-debug\data\villages.dat")]
+        [InlineData(@"..\..\..\Data\1_8_3-debug\data\villages_end.dat")]
+        [InlineData(@"..\..\..\Data\1_8_3-debug\data\villages_nether.dat")]
+        public async Task AsyncReadWriteTreeDoesNotAlterTheData(string file)
+        {
+            var input = ReadFile(file);
+            NbtTree tree;
+            using (var ms = new MemoryStream(input))
+            {
+                tree = new NbtTree();
+                await tree.ReadFromAsync(ms).ConfigureAwait(false);
+            }
+
+            byte[] output;
+            using (var ms = new MemoryStream())
+            {
+                await tree.WriteToAsync(ms).ConfigureAwait(false);
                 output = ms.ToArray();
             }
 
